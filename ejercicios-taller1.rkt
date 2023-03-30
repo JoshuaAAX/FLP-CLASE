@@ -227,3 +227,36 @@
 
 ;;==============================================================================================
 
+;; Ejercicio 7 / aux-product:
+;; L E1 -> L
+;; Proposito: combinar el elemento e1 con cada elemento de la L
+;; <lista> := ()
+;;         := (<elemento> <lista>)
+(define aux-product
+  (lambda (E1 L)
+    (if(null? L)
+        L
+        (cons  (cons E1 (cons (car L) empty)) (aux-product E1 (cdr L)))
+     )
+  )
+)
+
+;; Ejercicio 7 / cartesian-product:
+;; L E1 -> L
+;; Proposito: retornar la tuplas que representan el producto cartesiano de las dos listas
+;; <lista> := ()
+;;         := (<elemento> <lista>)
+(define cartesian-product
+  (lambda (L1 L2)
+    (if (null? L1)
+        L1
+        (append (aux-product (car L1) L2) (cartesian-product (cdr L1) L2) )
+    )
+  )
+)
+
+; PRUEBAS
+(cartesian-product '(a b c) '(x y))
+(cartesian-product '(p q r) '(5 6 7))
+
+;;==============================================================================================
