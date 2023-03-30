@@ -489,3 +489,68 @@
 (simpson-rule (lambda (x) (* x (* x x))) 1 5 8)
 (simpson-rule (lambda (x) x) 1 5 12)
 
+
+
+
+;; Ejercicio 18 - Pascal
+;; INT -> L
+;; Proposito: retorna la fila N
+;; del triangulo de Pascal.
+(define pascal
+  (lambda (n)
+    (aux-pascal n 1 '(1))
+  )
+)
+
+;; PRUEBAS
+(pascal 5)
+(pascal 1)
+
+
+;; Aux suma
+;; L , L -> L
+;; Propósito:toma dos listas de números de igual tamaño
+;; y devuelve una nueva lista con la suma de cada elemento de las listas originales.
+
+(define suma
+   (lambda (L1 L2)
+     (if (or (null? L1) (null? L2))
+         empty
+         (cons (+ (car L1) (car L2)) (suma (cdr L1) (cdr L2)))
+     )
+   )
+)
+(suma '(0 1 3 3 1) '(1 3 3 1 0))
+
+;; Aux new-list
+;; L -> L
+;;Proposito: Entra una lista y sale otra lista pero es la iteración siguien de pascal
+;;se utilizo append directamente ya que en ejercicios anteriores se mostro su implementación
+;,lo mismo con la implementación de list que se utilizo en la entrada de un ejemplo
+
+(define new-list
+  (lambda (L)
+     (suma (append (list 0) L) (append L (list 0)))
+  )
+)
+
+(new-list '(1 3 3 1))
+
+;; Aux-Pascal
+;;
+;; toma tres argumentos: el número de términos que se quieren generar,
+;;un contador y la lista inicial que se utilizará para generar la secuencia.
+;;La función utiliza la recursión para llamarse a sí misma, actualizando el contador
+;;y la lista inicial en cada iteración hasta que se alcanza el número de términos deseado.
+
+(define aux-pascal
+   (lambda (n counter initial)
+       (if (= n counter)
+           initial
+           (aux-pascal n (+ 1 counter) (new-list  initial) )
+       )
+   )
+)
+
+(aux-pascal 5 1 '(1))
+
