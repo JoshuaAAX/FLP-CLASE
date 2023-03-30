@@ -360,5 +360,20 @@
 
 ;;==============================================================================================
 
+;;Ejercicio 11 / zip
+;;F L L2 -> L
+;; Proposito: Retorna una lista donde la posición n-ésima es el resultado de aplicar F sobre los elementos de L1 yL2 en esa posición.
+;; <lista> := ()
+;;         := (<int> <lista>)
+(define zip
+  (lambda (F L1 L2)
+     (if (eqv? L1 '())
+      empty   
+      (cons (F(car L1) (car L2))
+            (zip F (cdr L1) (cdr L2))))))
+            
+;; PRUEBAS
+(zip + '(1 4) '(6 2))
+(zip * '(11 5 6) '(10 9 8))
 
-
+;;==============================================================================================
