@@ -1,2 +1,2 @@
 # FLP-CLASE
-![ikea monkey](ikea_monkey2.jpg)
+![ikea monkey](ikea_monkey1.png)
