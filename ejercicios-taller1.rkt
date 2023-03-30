@@ -360,20 +360,44 @@
 
 ;;==============================================================================================
 
-;;Ejercicio 11 / zip
-;;F L L2 -> L
-;; Proposito: Retorna una lista donde la posición n-ésima es el resultado de aplicar F sobre los elementos de L1 yL2 en esa posición.
-;; <lista> := ()
-;;         := (<int> <lista>)
-(define zip
-  (lambda (F L1 L2)
-     (if (eqv? L1 '())
-      empty   
-      (cons (F(car L1) (car L2))
-            (zip F (cdr L1) (cdr L2))))))
-            
-;; PRUEBAS
-(zip + '(1 4) '(6 2))
-(zip * '(11 5 6) '(10 9 8))
+
+
+
+
 
 ;;==============================================================================================
+
+
+
+;; Ejercicio 12 / filter-acum
+;; a, b, F, acum, filter -> int: Recibe 5 entradas, las dos primeras corresponden a los valores
+;; Proposito: 
+;; Filter acum recibe cinco parametros, dos numeros a y b una funcion binaria F, un valor inicial acum y una funcion unaria filter
+;; y retorna todos los elemento que estan en el intervalo [a,b] y que a su vez cumplen con el predicado de la funcion filter
+;; el resultado debe ir consevando en acum y finalmente retornara el ultimo valor obtetenido en acum.
+
+(define filter-acum
+  (lambda(a b F acum filter)
+    (if (and (eqv? F *) (eqv? acum 0))
+       (if(<= a b)
+   (if (filter a) (F 1 (filter-acum (+ a 1) b F a filter))
+       (filter-acum (+ a 1) b F 1 filter))
+     acum)
+        
+        (cond
+          [(<= a b)(cond
+                     [(filter a) (F acum (filter-acum (+ a 1) b F a filter))]
+                     [else (filter-acum (+ a 1) b F acum filter)])]
+          [else acum])
+        )
+    )
+  )
+
+
+;;PRUEBAS
+(filter-acum 1 10 + 0 odd?)
+(filter-acum 1 10 + 0 even?)
+
+;;==============================================================================================
+
+
