@@ -323,3 +323,42 @@
 (inversions '(1 2 3 4))
 
 ;;==============================================================================================
+
+;; Ejercicio 10 / aux-up:
+;; L -> L
+;; Proposito: retorna elementos con un nivel menos de parentesis
+;; <lista> := ()
+;;         := (<elemento> <lista>)
+
+(define aux-up
+  (lambda (hlist rlist)
+   (cond
+     [(null? hlist)
+     (up rlist)]
+     [(pair? hlist)
+      (cons (car hlist)
+           (aux-up (cdr hlist) rlist))]
+      [else
+       (cons hlist (up rlist))])))
+
+;; Ejercicio 10 / up:
+;; L -> L
+;; Proposito: Retorna lista con un un nivel menos de parentesis.
+;; <lista> := ()
+;;         := (<elemento> <lista>)
+
+(define up
+   (lambda (L)
+  (if (null? L)
+      '()
+      (aux-up (car L) (cdr L)))))
+
+
+;; PRUEBAS
+(up '((1 2) (3 4)))
+(up '((x (y)) z))
+
+;;==============================================================================================
+
+
+
