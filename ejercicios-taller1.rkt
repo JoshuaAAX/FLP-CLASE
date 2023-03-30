@@ -112,6 +112,25 @@
 (aux-list-set '(5 8 7 6) 3 '(1 5 10) 0 mayor5? )
 (aux-list-set '(5 8 7 6) 0 '(1 5 10) 0 mayor5? )
 
+;; Ejercicio 3 / list-set:
+;; L n x -> L
+;; Proposito: retorna la lista pero teniendo en la posición n el elemento x solo si cumple el predicado
+;; <lista> := ()
+;;         := ((<elemento> <lista>) <lista>)
+
+(define list-set
+  (lambda (L n x P)
+    (aux-list-set L n x 0 P)
+  )
+)
+
+;; PRUEBAS
+(list-set '(1 2 3 4) 2 '(1 2) even?)
+(list-set '(5 8 7 6) 2 '(1 2) odd?)
+(list-set '(5 8 7 6) 2 '(1 2) even?)
+(list-set '(5 8 7 6) 3 '(1 5 10) mayor5? )
+(list-set '(5 8 7 6) 0 '(1 5 10) mayor5? )
+
 
 ;;==============================================================================================
 
@@ -138,4 +157,40 @@
 (filter-in number? '(a 2 (1 3) b 7))
 (filter-in symbol? '(a (b c) 17 foo))
 
+;;==============================================================================================
+
+;; Ejercicio 5 / aux-list-index:
+;; L P counter -> L
+;; Proposito: retornar la posición del primer elemento que satisface el predicado,
+;;        	en caso de no hacerlo retorna #f guardando la posición en counter
+;; <lista> := ()
+;;     	:= ((<elemento> <lista>) <lista>)
+
+(define aux-list-index
+  (lambda (P L counter)
+	(if (null? L)
+    	#f
+    	(if (P (car L))
+         	counter
+         	(aux-list-index P (cdr L) (+ counter 1))
+     	)    
+ 	)
+   )
+)
+
+;; Ejercicio 5 / list-index:
+;; L P -> L
+;; Proposito: retornar la posición del primer elemento que satisface el predicado,
+;;        	en caso de no hacerlo retorna #f
+;; <lista> := ()
+;;     	:= ((<elemento> <lista>)<lista>)
+
+(define list-index
+  (lambda (P L)
+ 	(aux-list-index P L 0)
+   )
+)
+;; PRUEBAS
+(list-index number? '(a 2 (1 3) b 7))
+(list-index symbol? '(1 2 (a b) 3))
 
