@@ -401,3 +401,27 @@
 ;;==============================================================================================
 
 
+;;==============================================================================================
+
+
+
+;; Ejercicio 14
+; path: int list -> list
+; Proposito: procedimiento que busca el camino del elemento n dentro del arbol binario de busqueda BST
+(define path
+  (lambda (n BST)
+    (cond
+      [(equal? n (car BST)) empty]
+      [(> n (car BST))(cons 'right (path n (caddr BST)))]
+      [(< n (car BST))(cons 'left (path n (cadr BST)))]
+      )
+    )
+  )
+
+;;Pruebas
+(path 17 '(14 (7 () (12 () ()))
+(26 (20 (17 () ())
+())
+(31 () ()))))
+
+
