@@ -538,6 +538,44 @@
 
 ;;==============================================================================================
 
+;; Ejercicio 17 / prod-scalar-matrix
+
+;; aux-matrix
+;; L L -> L
+;; Proposito: Recibe listas y multiplica sus elementos.
+;; <lista> := ()
+;;         := (<int> <lista>)
+
+(define aux-matrix
+  (lambda (mat vec)
+    (cond [(or (null? mat) (null? vec)) empty]
+          [else (cons (*(car mat) (car vec)) 
+          (aux-matrix (cdr mat) (cdr vec )))]
+          )
+    )
+  )
+
+;; prod-scalar-matriz:
+;; L L -> L
+;; Proposito:Recibe una matriz mat representada como una lista de listas y un vector vec representado como una lista 
+;; y retorna el resultado de realizar la multiplicacion matriz por vector.
+;; <lista> := ()
+;;         := ((<int> <lista>) <lista>)
+
+(define prod-scalar-matriz
+  (lambda (mat vec)
+    (cond [(or (null? mat) (null? vec)) empty]
+          [else(append (list(aux-matrix(car mat) vec))
+          (prod-scalar-matriz (cdr mat) vec ))]
+          )
+    )
+  ) 
+
+;;PRUEBAS
+(prod-scalar-matriz '((1 1) (2 2)) '(2 3))
+(prod-scalar-matriz '((1 1) (2 2) (3 3)) '(2 3))
+
+;;==============================================================================================
 
 ;; Ejercicio 18 - Pascal
 ;; INT -> L
