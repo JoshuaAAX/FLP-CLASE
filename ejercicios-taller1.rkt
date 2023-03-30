@@ -260,3 +260,26 @@
 (cartesian-product '(p q r) '(5 6 7))
 
 ;;==============================================================================================
+
+;; Ejercicio 8 / mapping
+;; F L1 L2 -> L
+;; Propósito: La funcíon debe retornar una lista de pares (a,b) siendo a elemento de L1 y b elemento de L2
+;;cumpliendose la propiedad que al aplicar la funcíon unaria F con el argumento  tal que F(a) = b.
+
+
+(define mapping
+  (lambda (F L1 L2)
+    (cond [(null? L1) empty]
+          [(null? L2) empty]
+          [(= (car L2) (F (car L1)))
+           (cons (list (car L1) (car L2)) (mapping F (cdr L1) (cdr L2)))]
+          [else (mapping F (cdr L1) (cdr L2))]
+          )
+    ))
+;;PRUEBAS
+(mapping (lambda (d) (* d 2)) (list 1 2 3) (list 2 4 6))
+(mapping (lambda (d) (* d 3)) (list 1 2 2) (list 2 4 6))
+(mapping (lambda (d) (* d 2)) (list 1 2 3) (list 3 9 12))
+
+
+;;==============================================================================================
