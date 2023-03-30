@@ -64,3 +64,45 @@
 ;; PRUEBAS
 (down '(1 2 3))
 (down '((una) (buena) (idea)))
+
+
+;; Ejercicio 3 / aux-list-set:
+;; L n x counter-> L
+;; Proposito: retorna la lista pero teniendo en la posición n el elemento x solo si cumple el predicado
+;;            mediante un contador que lleva las posiciones
+;; <lista> := ()
+;;         := ((<elemento> <lista>) <lista>)
+
+(define aux-list-set
+  (lambda (L n x counter P)
+    (if (null? L)
+        L
+        (if (and (= counter n) (P (car L)) )
+            (cons x (aux-list-set (cdr L) n x (+ counter 1) P))
+            (cons (car L) (aux-list-set (cdr L) n x (+ counter 1) P))
+         )
+     )
+   )
+)
+
+;; mayor5?
+;; int -> boolean
+;; Proposito: retorna true si el número es 5 en caso contrario retorna false
+;; <elemento> := ()
+;;            := <número> 
+(define mayor5?
+   (lambda (n)
+     (if (> n 5)
+       #t
+       #f
+     )
+   )
+)
+
+
+;;PRUEBA
+(aux-list-set '(1 2 3 4) 2 '(1 2) 0 even?)
+(aux-list-set '(5 8 7 6) 2 '(1 2) 0 odd?)
+(aux-list-set '(5 8 7 6) 2 '(1 2) 0 even?)
+(aux-list-set '(5 8 7 6) 3 '(1 5 10) 0 mayor5? )
+(aux-list-set '(5 8 7 6) 0 '(1 5 10) 0 mayor5? )
