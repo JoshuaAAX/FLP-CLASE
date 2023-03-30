@@ -4,6 +4,8 @@
 ;;Damian Espinosa - 2028180
 ;; Taller 1 FLP
 
+;;==============================================================================================
+
 ;; Ejercicio 1 /Append:
 ;; L1 L2 -> L
 ;; Proposito: Retorna una lista con todos los elementos de las listas de argumento dadas.
@@ -46,6 +48,8 @@
 (invert '((3 2) (4 2) (1 5) (2 8)) even?)
 (invert '((6 9) (10 90) (82 7) ) odd? )
 
+;;==============================================================================================
+
 ;; Ejercicio 2 / down:
 ;; L -> L
 ;; Proposito: retornar los elementos de la lista con un nivel más de paréntesis
@@ -65,6 +69,7 @@
 (down '(1 2 3))
 (down '((una) (buena) (idea)))
 
+;;==============================================================================================
 
 ;; Ejercicio 3 / aux-list-set:
 ;; L n x counter-> L
@@ -106,3 +111,31 @@
 (aux-list-set '(5 8 7 6) 2 '(1 2) 0 even?)
 (aux-list-set '(5 8 7 6) 3 '(1 5 10) 0 mayor5? )
 (aux-list-set '(5 8 7 6) 0 '(1 5 10) 0 mayor5? )
+
+
+;;==============================================================================================
+
+
+;; Ejercicio 4 / filter-in:
+;; L P -> L
+;; Proposito: retorna una lista con los elementos que stisfacen el predicado
+;; <lista> := ()
+;;     	:= ((<elemento> <lista>) <lista>)
+
+(define filter-in
+  (lambda (P L)
+	(if (null? L)
+    	L
+    	(if (P (car L))
+        	(cons (car L) (filter-in P (cdr L)))
+        	(filter-in P (cdr L))
+     	)
+ 	)
+   )
+)
+
+;; PRUEBAS
+(filter-in number? '(a 2 (1 3) b 7))
+(filter-in symbol? '(a (b c) 17 foo))
+
+
