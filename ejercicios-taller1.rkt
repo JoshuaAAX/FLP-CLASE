@@ -458,3 +458,34 @@
 (31 () ()))))
 
 
+;;==============================================================================================
+
+;; Ejercicio 16 / simpson-rule
+;;  Función auxiliar de sumatoria
+
+
+(define (aux-sum term a next b)
+      (if (> a b)
+          0
+          (+ (term a)
+             (aux-sum term (next a) next b))))
+;; simpson-rule
+;; f a b n -> int
+;; Proposito: c ́alcula la integral de una funci ́on f entre los valores a y b mediante la regla de Simpson.
+;; <lista> := <int>
+
+
+    (define (simpson-rule f a b n)
+      (define h (/ (- b a) n))
+      (define (next x) (+ x (* 2 h)))
+      (* (/ h 3) (+ (f a)
+                    (* 4 (aux-sum f (+ a h) next (- b h)))
+                    (* 2 (aux-sum f (+ a (* 2 h)) next (- b (* 2 h))))
+                    (f b))))
+
+
+
+;;PRUEBAS
+(simpson-rule (lambda (x) (* x (* x x))) 1 5 8)
+(simpson-rule (lambda (x) x) 1 5 12)
+
