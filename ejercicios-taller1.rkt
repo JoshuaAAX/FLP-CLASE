@@ -194,3 +194,36 @@
 (list-index number? '(a 2 (1 3) b 7))
 (list-index symbol? '(1 2 (a b) 3))
 
+;;==============================================================================================
+
+;; Ejercicio 6 / swapper
+;; L E1 E2 -> L
+;; Proposito: La función retorna una lista similar a L,
+;;        	solo que cada ocurrencia anterior de E1 será reemplazada por E2
+;;        	y cada ocurrencia anterior de E2 será reemplazada por E1
+;; <lista> := ()
+;;     	:= (<elemento> <lista>)
+
+(define swapper
+  (lambda (E1 E2  L)
+ 	(if (null? L)
+      	L
+      	(cond
+         	[(equal? (car L) E1)
+          	(cons E2 (swapper E1 E2 (cdr L)))]
+         	[(equal? (car L) E2)
+          	(cons E1 (swapper E1 E2 (cdr L)))]
+         	[else (cons (car L) (swapper E1 E2 (cdr L)))]     	 
+       	)
+  	)
+   )
+)
+
+;; PRUEBAS
+(swapper 'a 'd '(a d () c d))
+(swapper 'x 'y '(y y x y x y x x y))
+
+
+
+;;==============================================================================================
+
