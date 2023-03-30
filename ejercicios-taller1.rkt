@@ -459,6 +459,53 @@
 
 
 ;;==============================================================================================
+;;ejercicio 15
+;; Ejercicio 1 /Appendq:
+;; L1 L2 -> L
+;; Proposito: Retorna una lista con todos los elementos de las listas de argumento dadas.
+;; <lista> := ()
+;;         := (<elemento> <lista>)
+
+(define Appendq
+  (lambda (l1 l2)
+     (if(null? l1)
+        l2
+         (cons (car l1) (Appendq (cdr l1) l2)))))
+
+
+
+
+(define count
+  (lambda (P tree)
+    (if (null? tree)
+         0
+         (if (and (P (car tree)) (not (= 0 (car tree))) ) 
+              (+  1 (count P (cadr tree))  (count P(caddr tree)) )
+              (+  (count P(cadr tree))  (count P(caddr tree)) )
+         )
+
+    )
+  )
+)
+
+(count even? '(8 (3 (1 () ()) (6 (4 () ()) (7 () ()))) (10 () (14 (13 () ()) ()))))
+(count odd? '(8 (3 (1 () ()) (6 (4 () ()) (7 () ()))) (10 () (14 (13 () ()) ()))))
+(count even? '(14 (7 () (12 () ())) (26 (20 (17 () ()) ())(31 () ())))  )
+(count odd? '(14 (7 () (12 () ())) (26 (20 (17 () ()) ())(31 () ())))  )
+
+;;< árbol-binario> := ( árbol-vacío) empty
+;;                 := (nodo) número <árbol-binario> <árbol-binario>
+(define count-odd-and-even
+  (lambda (tree)
+   (Appendq (cons (count even? tree) empty) (cons (count odd? tree) empty))
+  )
+)
+
+(count-odd-and-even '(14 (7 () (12 () ()))
+(26 (20 (17 () ())
+())
+(31 () ()))))
+;;==============================================================================================
 
 ;; Ejercicio 16 / simpson-rule
 ;;  Función auxiliar de sumatoria
