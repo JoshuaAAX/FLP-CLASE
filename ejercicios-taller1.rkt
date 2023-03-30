@@ -283,3 +283,43 @@
 
 
 ;;==============================================================================================
+
+;; Ejercicio 9 / aux-inversions:
+;; x L -> INT
+;; Proposito: Retorna cuantas posiciones avanzo para acomodar el elemento x en la lista L
+;;
+;;<lista> := ()
+;;        := (<elemento-número> <lista>)
+(define aux-inversions
+  (lambda (x L counter)
+     (if (null? L)
+         counter
+        (if (< (car L) x)
+            (aux-inversions x (cdr L) (+ counter 1))
+            (aux-inversions x (cdr L) counter)
+         )
+      )
+   )
+)
+
+;; Ejercicio 9 / inversions:
+;; L -> INT
+;; Proposito: determina el n´umero de inversiones de la lista L. De manera formal, sea A = (a1a2...an) una lista de n n´umeros diferentes, si i < j (posicion)
+;;y ai > aj (dato en la posici´on) entonces la pareja (i j) es una inversi´on de A.
+;;
+;;<lista> := ()
+;;        := (<elemento-número> <lista>)
+(define inversions
+  (lambda (L)
+     (if (null? L)
+          0
+          (+ (aux-inversions (car L) (cdr L) 0) (inversions (cdr L)))
+      )
+   )
+)
+
+;; PRUEBAS
+(inversions '(2 3 8 6 1)) 
+(inversions '(1 2 3 4))
+
+;;==============================================================================================
