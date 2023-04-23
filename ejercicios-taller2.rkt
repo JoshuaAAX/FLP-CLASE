@@ -75,6 +75,7 @@
 
 ;;==================================================================================================================
 
+
 ;; <expresion> := <clausula> | (<clausula>) AND (<clausula>) | <expresion>
 ;; <clausula>:= <varible> | <variable> OR <variable> | <clausula>
 ;; <variable> := <number> | - <number>
@@ -98,19 +99,23 @@
     )
   )
 
-(define-datatype expresion expresion?
-   (una_clausula (clausula clausula?))
-   (dos_clausulas  (clausula1 clausula?) (clausula2 clausula?))
+
+(define-datatype variable variable?
+   (digito_normal  (digito number?) )
+   (digito_negado  (digito number?) )
 )
+
 
 (define-datatype clausula clausula?
    (una_variable (variable variable?) )
    (dos_variables (variable1 variable?) (variable2 variable?))
 )
 
-(define-datatype variable variable?
-   (digito_normal  (digito number?) )
-   (digito_negado  (digito number?) )
+
+
+(define-datatype expresion expresion?
+   (una_clausula (clausula clausula?))
+   (dos_clausulas  (clausula1 clausula?) (clausula2 clausula?))
 )
 
 
@@ -125,8 +130,6 @@
 )
 
 
-
-
 (define unparse-clausula
    (lambda (cla)
      (cases clausula cla
@@ -137,7 +140,6 @@
 )
 
 
-
 (define unparse-expresion
    (lambda (exp)
      (cases expresion exp
@@ -146,7 +148,4 @@
      )
    )
 )
-
-
-
 
