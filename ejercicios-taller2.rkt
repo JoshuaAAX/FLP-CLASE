@@ -107,15 +107,15 @@
 
 
 (define-datatype clausula clausula?
-   (una_variable (variable variable?) )
-   (dos_variables (variable1 variable?) (variable2 variable?))
+   (una_clausula (variable variable?) )
+   (dos_clausulas (variable1 variable?) (variable2 clausula?) ) 
 )
 
 
 
 (define-datatype expresion expresion?
-   (una_clausula (clausula clausula?))
-   (dos_clausulas  (clausula1 clausula?) (clausula2 clausula?))
+   (una_expresion (clausula clausula?))
+   (dos_expresiones  (clausula1 clausula?) (clausula2 expresion?))
 )
 
 
@@ -133,8 +133,8 @@
 (define unparse-clausula
    (lambda (cla)
      (cases clausula cla
-         (una_variable (cla) (unparse-variable  cla))
-         (dos_variables (cla1  cla2) (list  (unparse-variable cla1) 'OR (unparse-variable cla2)))
+         (una_clausula (cla) (unparse-variable  cla))
+         (dos_clausulas (cla1  cla2) (list  (unparse-variable cla1) 'OR (unparse-clausula cla2)))
      )
    )
 )
@@ -143,9 +143,12 @@
 (define unparse-expresion
    (lambda (exp)
      (cases expresion exp
-         (una_clausula (exp) (unparse-clausula  exp))
-         (dos_clausulas (exp1 exp2) (list  (unparse-clausula exp1) 'AND (unparse-clausula exp2)))
+         (una_expresion (exp) (unparse-clausula  exp))
+         (dos_expresiones (exp1 exp2) (list  (unparse-clausula exp1) 'AND (unparse-expresion exp2)))
      )
    )
 )
+
+
+
 
