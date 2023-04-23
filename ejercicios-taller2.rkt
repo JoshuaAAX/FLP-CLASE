@@ -137,14 +137,6 @@
 )
 
 
-(define unparse-expresion
-   (lambda (exp)
-     (cases expresion exp
-         (una_expresion (exp) (unparse-clausula  exp))
-         (dos_variables (cla1  cla2) (list  (unparse-variable cla1) 'OR (unparse-variable cla2)))
-     )
-   )
-)
 
 (define unparse-expresion
    (lambda (exp)
