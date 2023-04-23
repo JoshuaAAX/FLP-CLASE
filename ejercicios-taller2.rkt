@@ -73,7 +73,7 @@
 ; (combi-booleano 2) => ((#t #t) (#t #f) (#f #t) (#f #f))
 ; (combi-booleano 3) => ((#t #t #t) (#t #t #f) (#t #f #t) (#t #f #f) (#f #t #t) (#f #t #f) (#f #f #t) (#f #f #f))
 
-
+;;==================================================================================================================
 
 ;; <expresion> := <clausula> | (<clausula>) AND (<clausula>) | <expresion>
 ;; <clausula>:= <varible> | <variable> OR <variable> | <clausula>
