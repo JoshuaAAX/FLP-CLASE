@@ -146,5 +146,15 @@
    )
 )
 
+(define unparse-expresion
+   (lambda (exp)
+     (cases expresion exp
+         (una_clausula (exp) (unparse-clausula  exp))
+         (dos_clausulas (exp1 exp2) (list  (unparse-clausula exp1) 'AND (unparse-clausula exp2)))
+     )
+   )
+)
+
+
 
 
