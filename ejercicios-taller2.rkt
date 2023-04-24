@@ -1,9 +1,9 @@
-;; <expresion> := <clausula> | <clausla> AND <clausula>
-;; <clausula>:= <varible> | <variable> OR <variable>
-;; <variable> := <digito> | - <digito>
-                  
+;; <expresion> := <clausula> | (<clausula>) AND (<clausula>) | <expresion>
+;; <clausula>:= <varible> | <variable> OR <variable> | <clausula>
+;; <variable> := <number> | - <number>
 
 #lang eopl
+         
 
 (define digito_normal
    (lambda (n)
@@ -11,11 +11,14 @@
    )
 )
 
+
 (define digito_negado
    (lambda (n)
       (* -1 n)
    )
 )
+
+
 
 (define digito?
   (lambda (digito)
@@ -23,38 +26,126 @@
   )
 )
 
+(define variable
+  (lambda (variable)
+    (if (digito? variable)
+        variable
+        'VariableNoConstruida
+    )
+  )
+)
+
 
 (define variable?
-  (lambda (variable)
-    (digito? variable )
+  (lambda (digit)
+    (digito? digit )
   )
 )
 
 
-(define clausula
-    (lambda (variable1  variable2)
-      (list 'or variable1 variable2)
+(define una_clausula
+    (lambda (var)
+      (if (variable? var)
+           var
+           'Una_clausulaNoConstruida
+       )
     )
 )
 
 
-(define expresion
-    (lambda (clausula1  clausula2)
-      (list  'and clausula1  clausula2)
+
+(define dos_clausulas
+    (lambda (var1  var2)
+      (if (and (variable? var1))
+          (list 'or var1 var2)
+           'dos_clausulasNoConstruida
+      )
     )
 )
 
 
-(define expresion? 
-  (lambda (exp)
-     (or (number? exp)
-       (and (pair? exp)
-           (eq? (cadr exp) 'AND)
-           (number? (car exp))
-           (expresion? (cddr exp))
-        )
+(define or->clausula
+  (lambda (list)
+    (car list)
+  )
+)
+
+(define varlist->clausula
+  (lambda (list)
+    (cdr list)
+  )
+)
+
+(define firstVar->clausula
+  (lambda (list)
+    (cadr list)
+  )
+)
+
+
+(define clausula?
+   (lambda (cla)
+     (if (eq? (or->clausula cla) 'or)
+         (if (pair? (varlist->clausula cla))
+             (variable? (firstVar->clausula cla))
+             #f
+         )
+         #f
      )
+   )
+)
+
+
+
+(define una_expresion
+    (lambda (cla)
+      (if (clausula? cla)
+           cla
+           'Una_expresionNoConstruida
+       )
+    )
+)
+
+
+
+(define dos_expresiones
+    (lambda (cla1  cla2)
+      (if (and (clausula? cla1))
+          (list 'and cla1 cla2)
+           'dos_expresionesNoConstruida
+      )
+    )
+)
+
+
+(define and->expresion
+  (lambda (list)
+    (car list)
   )
+)
+
+(define varlist->expresion
+  (lambda (list)
+    (cdr list)
+  )
+)
+
+(define firstCla->expresion
+  (lambda (list)
+    (cadr list)
+  )
+)
+
+(define expresion?
+   (lambda (exp)
+     (if (eq? (and->expresion exp) 'and)
+         (if (pair? (varlist->expresion exp))
+             (variable? (firstCla->expresion exp))
+             #f
+         )
+         #f
+     )
+   )
 )
 
 
