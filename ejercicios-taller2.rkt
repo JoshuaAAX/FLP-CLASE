@@ -13,6 +13,8 @@
    )
 )
 
+;;(digito_negado 5) -> -5
+;;(digito_negado -5) -> 5
 
 (define digito_negado
    (lambda (n)
@@ -20,7 +22,8 @@
    )
 )
 
-
+;;(variable(digito_negado 4))-> -4
+;;(variable(digito_normal 5))-> 5
 
 (define digito?
   (lambda (digito)
@@ -54,7 +57,15 @@
     )
 )
 
+;;(una_clausula
+;;        (variable(digito_normal 5))
+;;       )
+;; -> 5
 
+;;(una_clausula
+;;        (variable(digito_negado 4))
+;;       )
+;; -> -4
 
 (define dos_clausulas
     (lambda (var1  var2)
@@ -65,6 +76,16 @@
     )
 )
 
+;;(dos_clausulas
+;;        (variable(digito_normal 5))
+;;        (variable(digito_negado 4))
+;;       ) -> (or 5 -4)
+
+;; (dos_clausulas
+;;        (variable(digito_normal 3))
+;;        (variable(digito_normal 3))
+;;       )
+;; -> (or 3 3)
 
 (define or->clausula
   (lambda (list)
@@ -108,7 +129,21 @@
     )
 )
 
+;;(una_expresion
+;;       (dos_clausulas
+;;        (variable(digito_normal 5))
+;;        (variable(digito_normal 5))
+;;       )
+;;  )
+;;  -> (or 5 5)
 
+;;(una_expresion
+;;       (dos_clausulas
+;;        (variable(digito_negado 5))
+;;        (variable(digito_negado 5))
+;;       )
+;;  )
+;; -> (or -5 -5)
 
 (define dos_expresiones
     (lambda (cla1  cla2)
@@ -119,6 +154,28 @@
     )
 )
 
+;;(dos_expresiones
+;;(dos_clausulas
+;;       (variable(digito_normal 4))
+;;       (variable(digito_normal 5))
+;;      )
+;;      (dos_clausulas
+;;       (variable(digito_normal 6))
+;;       (variable(digito_normal 7))
+;;      )
+;; )
+;; ->(and (or 4 5) (or 6 7))
+
+;;(dos_expresiones
+;;(dos_clausulas
+;;       (variable(digito_negado 4))
+;;       (variable(digito_normal 5))
+;;      )
+;;      (dos_clausulas
+;;       (variable(digito_normal 6))
+;;       (variable(digito_negado 7))
+;;      ))
+;; -> (and (or -4 5) (or 6 -7))
 
 (define and->expresion
   (lambda (list)
