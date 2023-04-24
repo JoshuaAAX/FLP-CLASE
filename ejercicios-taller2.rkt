@@ -303,7 +303,7 @@
 
 ;; unparse de  listas
 
-
+;; punto 2.1
 
 (define (ultimo lst)
   (cond
