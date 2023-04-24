@@ -400,4 +400,51 @@
 )
 
 
+(define or-undo
+  (lambda (lst)
+    (cond
+      ((null? lst) '())
+      ((not (list? lst)) lst)
+      ((eq? (car lst) 'or) (list (cadr lst) 'or (or-undo (caddr lst)))  )
+      (else (or-undo (cdr lst)))
+    )
+  )
+)
+
+
+
+(define and-undo
+  (lambda (lst)
+    (cond
+      ((null? lst) '())
+      ((not (list? lst)) lst)
+      ((eq? (car lst) 'and) (list (cadr lst) 'and (and-undo (caddr lst)))  )
+      (else (and-undo (cdr lst)))
+    )
+  )
+)
+
+
+(define (aplanar lista)
+  (cond ((null? lista) '())
+        ((list? (car lista)) (append (aplanar (car lista)) (aplanar (cdr lista))))
+        (else (cons (car lista) (aplanar (cdr lista))))
+  )
+) 
+
+
+
+(define UNPARSERBNF
+  (lambda (lst)
+    (cond
+      ((null? lst) '()) 
+      ((list? (car lst)) (aplanar(or-undo (car lst)) ))
+      (else (list (UNPARSERBNF(cdr lst))  ))
+    )
+  )
+)
+
+
+
+
 
