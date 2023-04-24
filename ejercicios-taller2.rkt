@@ -238,19 +238,24 @@
    (digito_negado  (digito number?) )
 )
 
+;;(variable? (digito_normal 5)) -> #t
+;;(variable? (digito_negado 5)) -> #t
 
 (define-datatype clausula clausula?
    (una_clausula (variable variable?) )
    (dos_clausulas (variable1 variable?) (variable2 clausula?) ) 
 )
 
-
+;; (clausula? (una_clausula(digito_negado 5))) -> #t
+;; (clausula? (dos_clausulas(digito_negado 5)(una_clausula(digito_normal 4)))) -> #t
 
 (define-datatype expresion expresion?
    (una_expresion (clausula clausula?))
    (dos_expresiones  (clausula1 clausula?) (clausula2 expresion?))
 )
 
+;; (expresion? (una_expresion (una_clausula(digito_negado 5))))
+;; (expresion? (dos_expresiones (una_clausula(digito_negado 5)) (una_expresion (una_clausula(digito_negado 5)))))
 
 ;;==================================================================================================================
 
