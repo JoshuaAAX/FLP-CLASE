@@ -1,51 +1,46 @@
 ;; <expresion> := <clausula> | <clausla> AND <clausula>
 ;; <clausula>:= <varible> | <variable> OR <variable>
-;; <variable> := <digito> | NOT <digito>
-;; <digito> := 1|2|...|n
+;; <variable> := <digito> | - <digito>
                   
 
 #lang eopl
 
-(define digito
+(define digito_normal
    (lambda (n)
-      (list 'digito n)
+      n
+   )
+)
+
+(define digito_negado
+   (lambda (n)
+      (* -1 n)
    )
 )
 
 (define digito?
-   (lambda (digito)
-      (if (number? (cadr digito))
-          #t
-          #f
-      )
-   )
-)
-
-(define (negation-of-digito? exp)
-  (and (eq? (car exp) 'NOT)
-     #t
+  (lambda (digito)
+    (number? digito)
   )
 )
 
+
 (define variable?
   (lambda (variable)
-    (or  (digito? variable)
-        (negation-of-digito?  variable)
-    )
+    (digito? variable )
   )
 )
 
 
 (define clausula
     (lambda (variable1  variable2)
-      (list variable1'or variable2)
+      (list 'or variable1 variable2)
     )
 )
 
 
 (define expresion
     (lambda (clausula1  clausula2)
-      (list  clausula1 'and clausula2)
+      (list  'and clausula1  clausula2)
     )
 )
 
@@ -61,6 +56,7 @@
      )
   )
 )
+
 
 (define (combi-booleano x)
   (if (<= x 0)
