@@ -1,3 +1,10 @@
+;; Joshua Sebastian Chicame Muñoz 2074121
+;; Damian Alessandro Espinosa Espinosa 2028180 
+;; una implentación  de una gramatica que permita escribir expresiones en FNC.
+;; basada en listas: Esta implementacion debera contener los respectivos
+;; constructores (fnc, and, or) y extractores (fnc− > var, fnc− >
+;; clausulas, or− > varlist)
+
 ;; <expresion> := <clausula> | (<clausula>) AND (<clausula>) | <expresion>
 ;; <clausula>:= <varible> | <variable> OR <variable> | <clausula>
 ;; <variable> := <number> | - <number>
@@ -232,6 +239,10 @@
 
 ;;==================================================================================================================
 
+;; Joshua Sebastian Chicame Muñoz 2074121
+;; Damian Alessandro Espinosa Espinosa 2028180 
+;; una implentación  de una gramatica que permita escribir expresiones en FNC.
+;; basada en datatypes
 
 ;; <expresion> := <clausula> | (<clausula>) AND (<clausula>) | <expresion>
 ;; <clausula>:= <varible> | <variable> OR <variable> | <clausula>
@@ -318,6 +329,13 @@
 
 
 ;;==================================================================================================================
+;; Joshua Sebastian Chicame Muñoz 2074121
+;; Damian Alessandro Espinosa Espinosa 2028180 
+;;funcion UNPARSEBNF para la representacion basada en listas
+;; donde dado un arbol de sintaxis abstracta
+;; de una instancia SAT, entrega la representacion concreta basada
+;; en listas.
+
 #lang eopl
 ;; unparse de  listas
 
