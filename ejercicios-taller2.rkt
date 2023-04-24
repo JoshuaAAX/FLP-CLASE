@@ -147,4 +147,67 @@
 
 
 
+;;==================================================================================================================
+
+
+
+(define (ultimo lst)
+  (cond
+    ((null? lst) #f) 
+    ((null? (cdr lst)) (car lst)) 
+    (else (ultimo (cdr lst))) 
+  )
+)
+
+(define (ultimo? elemento lista)
+  (eq? elemento (ultimo lista)))
+
+
+(define or-intermediate
+  (lambda (lst)
+    (cond
+      ((null? lst) '()) 
+      ((not (list? lst)) lst)
+      ((eq? (car lst) 'or) (or-intermediate (cdr lst) ))
+      (else (list 'or (car lst) (if (ultimo? (caddr lst) lst )
+                                    (caddr lst)
+                                    (or-intermediate (cdr lst))
+                                  )
+            )
+      )
+    )
+  )
+)
+
+
+(define and-intermediate
+  (lambda (lst)
+    (cond
+      ((null? lst) '()) 
+      ((not (list? lst)) lst)
+      ((eq? (car lst) 'and ) (and-intermediate (cdr lst) ))
+      (else (list 'and (or-intermediate (car lst)) (if (ultimo? (caddr lst) lst )
+                                    (or-intermediate (caddr lst))
+                                    (and-intermediate (cdr lst))
+                                  )
+            )
+      )
+    )
+  )
+)
+
+
+
+(define PARSERBNF
+  (lambda (lst)
+    (cond
+      ((null? lst) '()) 
+      ((not (list? lst)) lst)
+      ((eq? (cadr lst) 'or ) (or-intermediate lst))
+      (else (and-intermediate lst) )
+    )
+  )
+)
+
+
 
