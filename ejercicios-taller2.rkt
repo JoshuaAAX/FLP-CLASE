@@ -177,6 +177,17 @@
 ;;      ))
 ;; -> (and (or -4 5) (or 6 -7))
 
+;;(dos_expresiones
+;;(dos_clausulas
+;;       (variable(digito_normal 7))
+;;       (variable(digito_negado 9))
+;;      )
+;;      (dos_clausulas
+;;       (variable(digito_negado 2))
+;;       (variable(digito_negado 4))
+;;      ))
+;; -> (and (or 7 9) (or -2 -4))
+
 (define and->expresion
   (lambda (list)
     (car list)
@@ -254,8 +265,10 @@
    (dos_expresiones  (clausula1 clausula?) (clausula2 expresion?))
 )
 
-;; (expresion? (una_expresion (una_clausula(digito_negado 5))))
-;; (expresion? (dos_expresiones (una_clausula(digito_negado 5)) (una_expresion (una_clausula(digito_negado 5)))))
+;; (una_expresion (una_clausula(digito_negado 5)))
+;; #(struct:una_expresion #(struct:una_clausula #(struct:digito_negado 5)))
+;; (dos_expresiones (una_clausula(digito_negado 5)) (una_expresion (una_clausula(digito_negado 5))))
+;; #(struct:dos_expresiones #(struct:una_clausula #(struct:digito_negado 5)) #(struct:una_expresion #(struct:una_clausula #(struct:digito_negado 5))))
 
 ;;==================================================================================================================
 
