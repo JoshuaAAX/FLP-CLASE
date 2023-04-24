@@ -216,7 +216,7 @@
    (lambda (cla)
      (cases clausula cla
          (una_clausula (cla) (unparse-variable  cla))
-         (dos_clausulas (cla1  cla2) (list  (unparse-variable cla1) 'OR (unparse-clausula cla2)))
+         (dos_clausulas (cla1  cla2) (list  (unparse-variable cla1) 'or (unparse-clausula cla2)))
      )
    )
 )
@@ -226,14 +226,25 @@
    (lambda (exp)
      (cases expresion exp
          (una_expresion (exp) (unparse-clausula  exp))
-         (dos_expresiones (exp1 exp2) (list  (unparse-clausula exp1) 'AND (unparse-expresion exp2)))
+         (dos_expresiones (exp1 exp2) (list  (unparse-clausula exp1) 'and (unparse-expresion exp2)))
      )
+   )
+)
+
+(define unparse-bnf
+   (lambda (instance-sat)
+       (list 'fnc (unparse-expresion instance-sat))
    )
 )
 
 
 
+
+
+
 ;;==================================================================================================================
+
+;; unparse de  listas
 
 
 
