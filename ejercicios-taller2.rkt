@@ -2,6 +2,8 @@
 ;; <clausula>:= <varible> | <variable> OR <variable> | <clausula>
 ;; <variable> := <number> | - <number>
 
+;; punto 1.1
+
 #lang eopl
          
 
@@ -166,7 +168,9 @@
 ;; <expresion> := <clausula> | (<clausula>) AND (<clausula>) | <expresion>
 ;; <clausula>:= <varible> | <variable> OR <variable> | <clausula>
 ;; <variable> := <number> | - <number>
-;; 
+
+
+;; punto 1.2
                   
 
 #lang eopl
@@ -200,6 +204,11 @@
        )
     )
 )
+
+
+;;==================================================================================================================
+
+;;unparse de datatypes
 
 
 (define unparse-clausula
