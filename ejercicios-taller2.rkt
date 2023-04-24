@@ -80,21 +80,6 @@
 
 #lang eopl
 
-(define-datatype bintree bintree?
-  (empty-b-tree)
-  (b-tree (num number?) (lson bintree?) (rson bintree?))
-)
-
-(define unparse
-  (lambda (arb)
-    (cases bintree arb
-      (empty-b-tree() '())
-      (b-tree (nodo left right)
-              (list nodo (unparse left) (unparse right)))
-      )
-    )
-  )
-
 
 (define-datatype variable variable?
    (digito_normal  (digito number?) )
