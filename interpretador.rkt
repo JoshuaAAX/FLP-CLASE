@@ -373,7 +373,32 @@ scan&parse
 ;evaluar @sumar(4, 5) finEval = 9
 ;evaluar @sumar(6, 8) finEval = 14
 
+
+;******************************************************************************************
 ; Punto D
+
+;Este programa permite restar y multiplicar dos números usando las funciones primitivas
+
+; declaraRec (
+;   @sumar(@a, @b) = Si @a entonces
+;     evaluar @sumar(sub1(@a), add1(@b)) finEval
+;     sino @b finSI
+;   @multiplicar (@a , @b) = Si @b entonces
+;     evaluar @sumar(@a, evaluar @multiplicar(@a,sub1(@b)) finEval) finEval
+;     sino 0 finSI
+;   @restar(@a , @b) = Si @b entonces
+;     evaluar @restar(sub1(@a),sub1(@b)) finEval
+;     sino @a finSI)
+;   {
+;    evaluar @multiplicar (10, 3) finEval  
+;   }
+;ejemplos
+;evaluar @multiplicar(4, 5) finEval = 20
+;evaluar @multiplicar (10, 3) finEval = 30
+;evaluar @restar (10, 3) finEval =7
+;evaluar @restar(8, 8) finEval = 0
+
+;******************************************************************************************
 
 ; Punto E
 ; funcion que muestra los nombres de los integrantes del grupo.
@@ -393,6 +418,9 @@ scan&parse
 ;      } 
 ;   }
 ;}
+
+
+;******************************************************************************************
 
 ; Punto F
 
