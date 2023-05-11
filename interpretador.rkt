@@ -11,7 +11,6 @@
 
 ;;Interpretador
 
-
 ;; La definición BNF para las expresiones del lenguaje:
 ;;
 ;;  <program>       ::= <expression>
@@ -146,17 +145,17 @@
   (lambda (exp env)
     (cases expression exp
       (numero-lit (datum) datum)
-      (text-lit (txt) (normalizar txt))
-      (var-exp (id) (buscar-variable env id))
+      (text-lit (txt) (normalize txt))
+      (var-exp (id) (search-var env id))
       (primapp-bin-exp (rand1 prim-bin rand2)
                    (let ((args  (eval-expression rand1 env))
                          (args2 (eval-expression rand2 env)))
-                     (apply-primitiva-binaria prim-bin args args2)))
+                     (apply-primitiva-bin prim-bin args args2)))
       (primapp-un-exp (prim-un rand)
                    (let ((args (eval-expression rand env)))
-                     (apply-primitiva-unaria prim-un args)))
+                     (apply-primitiva-una prim-un args)))
       (condicional-exp (test-exp true-exp false-exp)
-              (if (valor-verdad? (eval-expression test-exp env))
+              (if (true-value? (eval-expression test-exp env))
                   (eval-expression true-exp env)
                   (eval-expression false-exp env)))
       (variableLocal-exp (ids rands body)
@@ -186,3 +185,133 @@
 (define eval-rand
   (lambda (rand env)
     (eval-expression rand env)))
+
+; apply-primitiva-bin: <primitiva> <expression> <expression> -> numero | text
+; aplica una función primitiva binaria a dos argumentos recibidos arg1 arg2
+(define apply-primitiva-bin
+  (lambda (prim arg1 arg2 )
+    (cases primitiva-binaria prim
+      (primitiva-suma () (+ arg1 arg2))
+      (primitiva-resta () (- arg1 arg2))
+      (primitiva-multi () (* arg1 arg2))
+      (primitiva-div () (/ arg1 arg2))
+      (primitiva-concat() (string-append arg1 arg2)) 
+      )))
+
+; apply-primitiva-una: <primitiva> <expression> -> numero
+; aplica una función primitiva unaria a un argumento recibido arg
+(define apply-primitiva-una
+  (lambda(prim arg)
+    (cases primitiva-unaria prim
+      (primitiva-longitud () (string-length (normalize arg)))
+      (primitiva-add1 () (+ arg 1))
+      (primitiva-sub1 () (- arg 1))
+    )))
+
+; normalize: elimina los backslash "\" de un string
+(define normalize
+  (lambda (s)
+    (if (string-ci=? s "") ""
+        (if (string-ci=? (substring s 0 1) "\"")
+            (normalize(substring s 1))
+            (string-append(substring s 0 1) (normalize(substring s 1)))))
+    )
+  )
+
+;Define el tipo de dato Procedimiento
+(define-datatype procVal procVal?
+  (cerradura
+   (lista-ID (list-of symbol?))
+   (exp expression?)
+   (amb environment?)))
+
+;apply-procedure: evalua el cuerpo de un procedimientos en el ambiente extendido
+(define apply-procedure
+  (lambda (proc args)
+    (cases procVal proc
+      (cerradura (ids body env)
+               (eval-expression body (extend-env ids args env))))))
+
+;true-value?: determina si un valor dado corresponde a un valor booleano falso o verdadero
+; <numero> -> <boolean>
+(define true-value?
+  (lambda (x)
+    (not (zero? x))))
+
+;******************************************************************************************
+;Ambientes
+
+;definición del tipo de dato ambiente
+(define-datatype environment environment?
+  (empty-env-record)
+  (extended-env-record (syms (list-of symbol?))
+                       (vals (list-of scheme-value?))
+                       (env environment?))
+  (recursively-extended-env-record (proc-names (list-of symbol?))
+                                   (idss (list-of (list-of symbol?)))
+                                   (bodies (list-of expression?))
+                                   (env environment?)))
+
+;Definir datos booleanos.
+(define scheme-value? (lambda (v) #t))
+
+; empty-env:    -> enviroment
+; función que crea un ambiente vacío
+(define empty-env  
+  (lambda ()
+    (empty-env-record)))
+
+;extend-env: <list-of symbols> <list-of numbers> enviroment -> extended-enviroment
+;función que extiende un ambiente.
+(define extend-env
+  (lambda (syms vals env)
+    (extended-env-record syms vals env)))
+
+; extend-env-recursively: <list-of symbols> <list-of <list-of symbols>> <list-of expressions> environment -> environment
+; función que extiende un ambiente para procedimientos recursivos
+(define extend-env-recursively
+  (lambda (proc-names idss bodies old-env)
+    (recursively-extended-env-record
+     proc-names idss bodies old-env))) 
+
+;función que busca un símbolo en un ambiente
+(define search-var
+  (lambda (env sym)
+    (cases environment env
+      (empty-env-record
+       ()
+                        (eopl:error 'search-var "No binding for ~s" sym))
+      (extended-env-record (syms vals env)
+                           (let ((pos (list-find-position sym syms)))
+                             (if (number? pos)
+                                 (list-ref vals pos)
+                                 (search-var env sym))))
+      (recursively-extended-env-record (proc-names idss bodies old-env)
+                                       (let ((pos (list-find-position sym proc-names)))
+                                         (if (number? pos)
+                                             (cerradura (list-ref idss pos)
+                                                      (list-ref bodies pos)
+                                                      env)
+                                             (search-var old-env sym)))))))
+
+;******************************************************************************************
+;Funciones Auxiliares
+
+; funciones auxiliares para encontrar la posición de un símbolo
+; en la lista de símbolos de unambiente
+
+;list-find-position: <symbol> <list-of-symbol> -> number
+(define list-find-position
+  (lambda (sym los)
+    (list-index (lambda (sym1) (eqv? sym1 sym)) los)))
+
+;list-index: <procedure> <list-of-symbol> -> number | boolean
+(define list-index
+  (lambda (pred ls)
+    (cond
+      ((null? ls) #f)
+      ((pred (car ls)) 0)
+      (else (let ((list-index-r (list-index pred (cdr ls))))
+              (if (number? list-index-r)
+                (+ list-index-r 1)
+                #f))))))
