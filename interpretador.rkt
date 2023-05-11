@@ -322,7 +322,7 @@ scan&parse
                 
                 
 ;******************************************************************************************
-;PUNTO 2
+;EVALUABLE
 
 ; PUNTO A)
 ; calcular el area de un circulo
@@ -338,6 +338,28 @@ scan&parse
 ;
 ;  evaluar @areaCirculo(@radio) finEval
 ;}
+;
 ;ejemplos
 ;@radio=2 = 12.566368;
 ;@radio=4 = 50.265472;
+
+; PUNTO B
+
+; PUNTO C
+; procedimiento que permite calcular una suma de forma recursiva
+;
+;declaraRec(
+;           @sumar(@a, @b) = Si @a entonces evaluar @sumar(sub1(@a), add1(@b)) finEval sino @b finSI
+;           ){
+;             evaluar @sumar(4, 5) finEval
+;             }
+;
+;ejemplos
+;evaluar @sumar(4, 5) finEval = 9
+;evaluar @sumar(6, 8) finEval = 14
+
+; Punto D
+
+; Punto E
+
+; Punto F
