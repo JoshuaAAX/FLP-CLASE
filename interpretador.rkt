@@ -343,7 +343,22 @@ scan&parse
 ;@radio=2 = 12.566368;
 ;@radio=4 = 50.265472;
 
+
+;******************************************************************************************
+
 ; PUNTO B
+; Calcular el factorial mediante recursión
+; se multiplica desde el número  hasta el parametro de entrada
+;declaraRec(
+;           @factorial(@n) = Si @n entonces (@n*evaluar @factorial(sub1(@n)) finEval) sino 1 finSI
+;           ){
+;             evaluar @factorial(5) finEval
+;             }
+;ejemplos
+;evaluar @factorial(5) finEval = 120
+;evaluar @factorial (10) finEval = 3628800
+
+;******************************************************************************************
 
 ; PUNTO C
 ; procedimiento que permite calcular una suma de forma recursiva
