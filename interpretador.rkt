@@ -88,3 +88,38 @@
 
 (define show-the-datatypes
   (lambda () (sllgen:list-define-datatypes scanner-spec-simple-interpreter grammar-simple-interpreter)))
+  
+  
+;*******************************************************************************************
+;Parser, Scanner, Interfaz
+
+;El FrontEnd (Análisis léxico (scanner) y sintáctico (parser) integrados)
+
+(define scan&parse
+  (sllgen:make-string-parser scanner-spec-simple-interpreter grammar-simple-interpreter))
+
+;El Analizador Léxico (Scanner)
+
+(define just-scan
+  (sllgen:make-string-scanner scanner-spec-simple-interpreter grammar-simple-interpreter))
+
+
+;*******************************************************************************************
+;; PUNTO 2 Ambiente inicial
+
+(define init-env
+  (lambda ()
+    (extend-env
+     '(@a @b @c @d @e )
+     '(1 2 3 "hola" "FLP")
+     (empty-env))))
+;*******************************************************************************************
+
+;; PUNTO 3 boleanos
+
+;valor-verdad?: determina si una expresion es veradera o falsa
+(define valor-verdad?
+  (lambda (x)
+    (not (zero? x))))
+
+;*******************************************************************************************
