@@ -89,3 +89,100 @@
     (primitiva-unaria ("add1") primitiva-add1)
     (primitiva-unaria ("sub1") primitiva-sub1)
     (primitiva-unaria ("longitud") primitiva-longitud)))
+
+;Construidos automáticamente:
+
+(sllgen:make-define-datatypes scanner-spec-simple-interpreter grammar-simple-interpreter)
+
+(define show-the-datatypes
+  (lambda () (sllgen:list-define-datatypes scanner-spec-simple-interpreter grammar-simple-interpreter)))
+
+;******************************************************************************************
+
+;El FrontEnd (Análisis léxico (scanner) y sintáctico (parser) integrados)l
+(define scan&parse
+  (sllgen:make-string-parser scanner-spec-simple-interpreter grammar-simple-interpreter))
+
+;El Analizador Léxico (Scanner)
+
+(define just-scan
+  (sllgen:make-string-scanner scanner-spec-simple-interpreter grammar-simple-interpreter))
+
+;El Interpretador (FrontEnd + Evaluación + señal para lectura )
+
+(define interpretador
+  (sllgen:make-rep-loop  "--> "
+    (lambda (pgm) (eval-program  pgm)) 
+    (sllgen:make-stream-parser 
+      scanner-spec-simple-interpreter
+      grammar-simple-interpreter)))
+
+;******************************************************************************************
+;El Interprete
+
+;eval-program: <programa> -> numero
+; función que evalúa un programa teniendo en cuenta un ambiente dado (se inicializa dentro del programa)
+
+(define eval-program
+  (lambda (pgm)
+    (cases program pgm
+      (un-programa (body)
+                 (eval-expression body (init-env))))))
+
+;init-env: ()--> <extend-env>
+; función que retorna un ambiente inicial en forma de sintaxis abstracta.
+; Ambiente inicial
+
+(define init-env
+  (lambda ()
+    (extend-env
+     '(@a @b @c @d @e @pi) 
+     '(1 2 3 "hola" "FLP" 3.141592) 
+     (empty-env))))
+
+; eval-expression: <expression> <enviroment> -> numero
+; evalua la expresión para la gramatica y recibe un ambiente
+(define eval-expression
+  (lambda (exp env)
+    (cases expression exp
+      (numero-lit (datum) datum)
+      (text-lit (txt) (normalizar txt))
+      (var-exp (id) (buscar-variable env id))
+      (primapp-bin-exp (rand1 prim-bin rand2)
+                   (let ((args  (eval-expression rand1 env))
+                         (args2 (eval-expression rand2 env)))
+                     (apply-primitiva-binaria prim-bin args args2)))
+      (primapp-un-exp (prim-un rand)
+                   (let ((args (eval-expression rand env)))
+                     (apply-primitiva-unaria prim-un args)))
+      (condicional-exp (test-exp true-exp false-exp)
+              (if (valor-verdad? (eval-expression test-exp env))
+                  (eval-expression true-exp env)
+                  (eval-expression false-exp env)))
+      (variableLocal-exp (ids rands body)
+              (let ((args (eval-rands rands env)))
+                (eval-expression body
+                                 (extend-env ids args env))))
+      (procedimiento-ex (ids cuerpo)
+                (cerradura ids cuerpo env))
+      (app-exp (rator rands)
+               (let ((proc (eval-expression rator env))
+                     (args (eval-rands rands env)))
+                 (if (procVal? proc)
+                     (apply-procedure proc args)
+                     (eopl:error 'eval-expression
+                                 "Attempt to apply non-procedure ~s" proc))))
+      (declaraRec-exp (proc-names idss bodies letrec-body)
+                  (eval-expression letrec-body
+                                   (extend-env-recursively proc-names idss bodies env))))))
+
+; funciones auxiliares para aplicar eval-rand a cada elemento de una lista de operandos (expresiones)
+; <lista> <enviroment> -> <lista>
+(define eval-rands
+  (lambda (rands env)
+    (map (lambda (x) (eval-rand x env)) rands)))
+
+; <structure-rand> <enviroment> -> <numero>
+(define eval-rand
+  (lambda (rand env)
+    (eval-expression rand env)))
