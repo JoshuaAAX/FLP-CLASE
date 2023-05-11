@@ -361,5 +361,24 @@ scan&parse
 ; Punto D
 
 ; Punto E
+; funcion que muestra los nombres de los integrantes del grupo.
+;
+;declarar(
+;     @integrantes = procedimiento() haga "Joshua Damian Luisa" finProc
+;){ 
+;   declarar(
+;     @saludar = procedimiento(@integrantes) haga
+;        procedimiento() haga ("Hola " concat evaluar @integrantes() finEval) finProc
+;        finProc
+;   ){
+;      declarar(
+;        @decorate = evaluar @saludar(@integrantes) finEval 
+;      ){
+;        evaluar @decorate() finEval
+;      } 
+;   }
+;}
 
 ; Punto F
+
+(interpretador)
