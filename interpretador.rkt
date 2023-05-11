@@ -36,6 +36,7 @@
 
 ;******************************************************************************************
 
+;;PUNTO 1
 ;Especificación Léxica
 
 (define scanner-spec-simple-interpreter
@@ -67,7 +68,6 @@
     (expression ("evaluar" expression  "(" (separated-list expression ",") ")" "finEval") eval-exp)
     (expression ("recursivo" "(" (separated-list identifier "(" (separated-list identifier ",") ")" "=" expression ";") ")"  "{" expression "}")recur-exp)
 
-
     ;;Primitiva
     (primitiva-binaria ("+") primitiva-suma)
     (primitiva-binaria ("~") primitiva-resta)
@@ -88,8 +88,7 @@
 
 (define show-the-datatypes
   (lambda () (sllgen:list-define-datatypes scanner-spec-simple-interpreter grammar-simple-interpreter)))
-  
-  
+
 ;*******************************************************************************************
 ;Parser, Scanner, Interfaz
 
@@ -113,6 +112,7 @@
      '(@a @b @c @d @e )
      '(1 2 3 "hola" "FLP")
      (empty-env))))
+
 ;*******************************************************************************************
 ;; PUNTO 3 boleanos
 
@@ -120,5 +120,3 @@
 (define valor-verdad?
   (lambda (x)
     (not (zero? x))))
-
-;*******************************************************************************************
