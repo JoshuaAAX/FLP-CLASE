@@ -315,3 +315,25 @@
               (if (number? list-index-r)
                 (+ list-index-r 1)
                 #f))))))
+                
+                
+;******************************************************************************************
+;PUNTO 2
+
+; PUNTO A)
+; calcular el area de un circulo
+; int -> int
+;
+;declarar(
+;  @radio=2.5;
+;  @areaCirculo=
+;       procedimiento(@radio)
+;            haga (@pi * (@radio * @radio))
+;       finProc
+;){
+;
+;  evaluar @areaCirculo(@radio) finEval
+;}
+;ejemplos
+;@radio=2 = 12.566368;
+;@radio=4 = 50.265472;
