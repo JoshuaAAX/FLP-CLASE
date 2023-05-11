@@ -61,6 +61,12 @@
     (expression (identifier) var-exp)
     (expression ( "(" expression primitiva-binaria expression ")") primapp-bin-exp)
     (expression (primitiva-unaria "(" expression ")") primapp-un-exp)
+    (expression ("si" expression "entonces" expression "sino" expression "finSi") if-exp)
+    (expression ("declarar" "(" (separated-list identifier "=" expression ";") ")" "{" expression "}") let-exp)
+    (expression ("procedimiento" "(" (separated-list identifier ";") ")" "haga" expression "finProc") procedimiento-ex)
+    (expression ("evaluar" expression  "(" (separated-list expression ",") ")" "finEval") eval-exp)
+    (expression ("recursivo" "(" (separated-list identifier "(" (separated-list identifier ",") ")" "=" expression ";") ")"  "{" expression "}")recur-exp)
+
 
     ;;Primitiva
     (primitiva-binaria ("+") primitiva-suma)
