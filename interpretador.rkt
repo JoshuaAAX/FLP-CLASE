@@ -114,7 +114,6 @@
      '(1 2 3 "hola" "FLP")
      (empty-env))))
 ;*******************************************************************************************
-
 ;; PUNTO 3 boleanos
 
 ;valor-verdad?: determina si una expresion es veradera o falsa
