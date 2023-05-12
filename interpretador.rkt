@@ -5,9 +5,9 @@
 
 ;; repositorio: https://github.com/JoshuaAAX/FLP-CLASE/blob/main/interpretador.rkt
 
-;;Joshua Chicame 
-;;Damian Espinosa
-;;Luisa Cardenas
+;;Joshua Chicame 2074121
+;;Damian Espinosa 2028180
+;;Luisa Cardenas 1823494
 
 ;******************************************************************************************
 
@@ -50,8 +50,8 @@
   (identifier
    ("@" letter (arbno (or letter digit "?"))) symbol)
   (text
-   ("\"" (or letter whitespace "_")
-              (arbno (or letter digit whitespace ":" "?" "=" "'" "_")) "\"") string)
+   ("\"" (or letter whitespace (or "-" "_"))
+              (arbno (or letter digit whitespace ":" "?" "=" "'" "_" "-")) "\"") string)
   (number
    (digit (arbno digit)) number)
   (number
@@ -406,11 +406,11 @@ scan&parse
 ; funcion que muestra los nombres de los integrantes del grupo.
 ;
 ;declarar(
-;     @integrantes = procedimiento() haga "Joshua Damian Luisa" finProc
+;     @integrantes = procedimiento() haga "Joshua-Damian-Luisa" finProc
 ;){ 
 ;   declarar(
 ;     @saludar = procedimiento(@integrantes) haga
-;        procedimiento() haga ("Hola " concat evaluar @integrantes() finEval) finProc
+;        procedimiento() haga ("Hola: " concat evaluar @integrantes() finEval) finProc
 ;        finProc
 ;   ){
 ;      declarar(
@@ -424,6 +424,36 @@ scan&parse
 
 ;******************************************************************************************
 
-; Punto F
+;Punto F
+
+;Se trata de un programa que empieza por crear una función llamada "@integrantes".
+;Esta función devuelve los nombres de los integrantes del grupo en formato de texto.
+;Luego se define una función llamada "@saludar" que toma como argumento la función "@integrantes"
+;y devuelve otra función que a su vez toma un parámetro "@mensaje". Esta segunda función concatena la cadena "Hola"
+;con la evaluación de la función "@integrantes" y finalmente añade el parámetro "@mensaje" introducido por el usuario.
+
+;Después se define la variable "@decorate" que evalúa la función "@saludar" con la función "@integrantes".
+;Finalmente, en el cuerpo del programa se evalúa la variable "@decorate" con el parámetro "-ProfesoresFLP".
+;
+;declarar(
+;     @integrantes = procedimiento() haga "Joshua-Luisa-Damian" finProc
+;){ 
+;   declarar(
+;     @saludar = procedimiento(@integrantes) haga
+;        procedimiento(@mensaje) haga (("Hola " concat evaluar @integrantes() finEval) concat @mensaje) finProc
+;        finProc
+;   ){
+;      declarar(
+;        @decorate = evaluar @saludar(@integrantes) finEval 
+;      ){
+;        evaluar @decorate("-ProfesoresFLP") finEval
+;      } 
+;   }
+;}
+;pruebas
+;evaluar @decorate(" Prueba 1") finEval
+;evaluar @integrantes = procedimiento() haga "Hola:Robinson-y-Sara-ProfesoresFLP" finProc
+;evaluar @decorate (" si esta bien") finEval  
 
 (interpretador)
+
