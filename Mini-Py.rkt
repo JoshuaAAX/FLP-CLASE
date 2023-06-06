@@ -272,6 +272,60 @@
     
     ;;Primitiva
     
+        ;;Primitiva
+
+    (primitiva ("print-obj") primitiva-print-obj)
+
+    (primitiva ("print")   primitiva-print)
+
+    ;;Primitiva numeros
+
+    (primitiva ("+")      primitiva-suma)
+    (primitiva ("~")      primitiva-resta)
+    (primitiva ("/")      primitiva-div)
+    (primitiva ("*")      primitiva-multi)
+    (primitiva ("%")      primitiva-mod)
+    (primitiva ("add1")   primitiva-add1)
+    (primitiva ("sub1")   primitiva-sub1)
+
+    ;;Primitiva cadenas
+    
+    (primitiva ("concat") primitiva-concat)
+    (primitiva ("longitud")  primitiva-longitud)
+
+    ;;Primitiva Listas y tuplas
+    
+    (primitiva ("null") primitiva-null)
+    (primitiva ("null?") primitiva-null?)
+
+    ;;primitiva lista
+    (primitiva ("lista?") primitiva-lista?)
+    (primitiva ("cons") primitiva-crear-lista)
+    (primitiva ("append") primitiva-append)
+    (primitiva ("ref-list") primitiva-ref-list)
+    (primitiva ("set-list") primitiva-set-list)
+    (primitiva ("head-list") primitiva-head-list)
+    (primitiva ("tail-list") primitiva-tail-list)
+    (primitiva ("len") primitiva-len)
+    ;falta tail
+
+    ;;primiiva tupla
+    (primitiva ("tupla?") primitiva-tupla?)
+    (primitiva ("crear-tupla") primitiva-crear-tupla)
+    (primitiva ("ref-tupla") primitiva-ref-tupla)
+    (primitiva ("head") primitiva-head)
+    (primitiva ("tail") primitiva-tail)
+
+    ;;primitiva registro
+    (primitiva ("registro?") primitiva-registro?)
+    (primitiva ("registro") primitiva-crear-registro)
+    (primitiva ("ref-registro") primitiva-ref-registro)
+    (primitiva ("set-registro") primitiva-set-registro)
+    
+   
+  )
+)
+    
 ;******************************************************************************************
 
 ;El Interprete
