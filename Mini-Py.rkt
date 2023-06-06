@@ -148,6 +148,132 @@
 ;;                := predes (predes)
 
 ;*******************************************************************************************
+
+
+;Especificación Léxica
+
+(define scanner-spec-simple-interpreter
+'(
+  (white-sp    (whitespace) skip)
+  (comentario     ("#" (arbno (not #\newline))) skip)
+  (identificador  ("@" letter (arbno (or letter digit))) symbol)
+  (texto        (letter (arbno (or letter digit ":" "?" "=" "'" "#" "$" "&" "." "," ";" "*" "!" "¡" "¿" "-" "_"))) string)
+  (numero       (digit (arbno digit)) number)
+  (numero       ("-" digit (arbno digit)) number)
+  (numero       (digit (arbno digit) "." digit (arbno digit)) number)
+  (numero       ("-" digit (arbno digit) "." digit (arbno digit)) number)
+ )
+)
+
+;Especificación Sintáctica (gramática)
+
+(define grammar-simple-interpreter
+  '(
+    ;;Programa
+    
+    (programa ((arbno class-decl) expresion) un-programa)
+
+    ;;class-decl
+    
+    (class-decl ("class" identificador "extends" identificador (arbno "field" identificador ) (arbno method-decl)) a-class-decl)
+
+    ;;method-decl
+
+    (method-decl ("method" identificador "("  (separated-list identificador  ",") ")" expresion )  a-method-decl)
+
+    ;;Expresiones para Objetos
+
+    (expresion ("new" identificador "(" (separated-list expresion ",") ")") new-object-exp)
+
+    (expresion ("send" expresion identificador "("  (separated-list expresion ",") ")") method-app-exp)
+
+    (expresion ("super" identificador   "("  (separated-list expresion ",") ")")  super-call-exp)
+    
+
+    ;;Expresion
+    
+    (expresion (numero)   numero-lit)
+
+    (expresion (crea-bignum "(" (arbno numero) ")") bignum-exp)
+
+    ;Para el manejo primitivas bignum
+    (expresion (primbin-bignum "(" expresion "," "(" (arbno numero) ")" ")") controlbin-bignum)
+    
+    (expresion (primun-bignum "(" expresion ")" ) controlun-bignum)
+    
+    (expresion (identificador)   id-exp)
+
+    (expresion ("\""texto"\"")   texto-lit)
+
+    (expresion ("false") false-exp)
+    
+    (expresion ("true") true-exp)
+
+    (expresion (primitiva "(" (separated-list expresion ",") ")")  primapp-exp)
+
+    (expresion ("if" expresion-bool "then""{" expresion "}" "else" "{" expresion "}" "end") condicional-exp)
+
+    (expresion ("procedimiento" "(" (separated-list identificador ",") ")" "haga" expresion "finProc" ) procedimiento-ex)
+    
+    (expresion ("evaluar"  expresion "("(separated-list expresion ",") ")" "finEval") app-exp)
+
+    (expresion ("letrec" (arbno identificador "(" (separated-list identificador ",") ")" "=" expresion )  "in" expresion) letrec-exp)
+
+    (expresion ("var" "{" (arbno identificador "=" expresion ";") "}" "in" expresion) var-exp)
+    
+    (expresion ("const" "{" (arbno identificador "=" expresion ";") "}" "in" expresion) const-exp)
+
+    (expresion ("[" (separated-list expresion ",") "]") lista)
+
+    (expresion ("tupla" "[" (separated-list expresion ",") "]") tupla)
+
+    (expresion ("{" "{"identificador "=" expresion "}"";" (arbno "{"identificador "=" expresion "}"";") "}") registro)
+
+    (expresion ("begin" "{" expresion ";" (arbno expresion ";") "}" "end") secuencia-exp)
+
+    (expresion ("set" identificador "=" expresion) set-exp)
+
+    (expresion ("while" expresion-bool "do" "{" expresion "}" "done" ) while-exp)
+
+    (expresion ("for" identificador "=" expresion "to" expresion "do" "{" expresion "}""done") for-exp)
+
+
+    ;;Expresion bool
+
+    (expresion-bool (pred-prim "("expresion "," expresion")") predicado-no-condicional)
+    (expresion-bool (oper-bin-bool "(" expresion-bool "," expresion-bool ")") predicado-bin-condicional)
+    (expresion-bool (oper-un-bool "(" expresion-bool ")") predicado-un-condicional )
+
+    ;;pred-prim
+    (pred-prim ("<") pred-prim-menor)
+    (pred-prim (">") pred-prim-mayor)
+    (pred-prim ("<=") pred-prim-menor-igual)
+    (pred-prim (">=") pred-prim-mayor-igual)
+    (pred-prim ("==") pred-prim-igual)
+    (pred-prim ("!=") pred-prim-dif)
+
+    ;;oper-bin-bool
+    (oper-bin-bool ("and") and-oper-bool)
+    (oper-bin-bool ("or") or-oper-bool)
+
+    ;;oper-un-bool
+    (oper-un-bool ("not") not-oper-bool) 
+
+    ;Primitivas bignum
+    (crea-bignum ("x8") octa-exp)
+    (crea-bignum ("x16") hexa-exp)
+    (crea-bignum ("x32") triges-exp)
+    (primbin-bignum ("sum-bignum") sum-bignum)
+    (primbin-bignum ("sub-bignum") sub-bignum)
+    (primbin-bignum ("mult-bignum") mult-bignum)
+    (primbin-bignum ("pot-bignum") pot-bignum)
+    (primun-bignum ("succes") succes)
+    (primun-bignum ("predes") predes)
+    
+    ;;Primitiva
+    
+;******************************************************************************************
+
 ;El Interprete
 
 ;eval-programa: <programa> -> expresion
