@@ -294,5 +294,67 @@
   (indirect-target (ref ref-to-direct-target?))
   (cons-target (expval no-refid-exp?))
   )
+;;===================================================================================
 
+;;Bignum
+
+(define zero
+  (lambda ()
+    '()))
+
+(define base 16)
+
+(define is-zero?
+  (lambda (n)
+    (null? n)))
+
+(define successor
+  (lambda (n)
+    (if (is-zero? n)
+	'(1)
+	(let ((t (+ (car n) 1)))
+	  (if (= t base)
+	      (cons 0 (successor (cdr n)))
+	      (cons t (cdr n))
+              )
+          )
+        )
+    )
+  )
+
+(define predecessor
+  (lambda (n)
+    (cond
+     ((is-zero? n) (eopl:error "cero no tiene predecesor"))
+     ((>= (car n) base) (eopl:error "el valor debe ser menor que 16"))
+     ((equal? n '(1)) '())
+     ((zero? (car n))
+      (if (null? (cdr n))
+	  (eopl:error "cero no tiene predecesor")
+	  (cons (- base 1) (predecessor (cdr n)))
+          )
+      )
+      (else (cons (- (car n) 1) (cdr n)))
+      )
+    )
+  )
+
+(define suma-bignum
+  (lambda (x y)
+    (if (is-zero? x)
+        y
+        (successor (suma-bignum (predecessor x) y)))))
+
+(define resta-bignum
+  (lambda (x y)
+    (if (is-zero? y)
+        x
+        (predecessor (resta-bignum  x (predecessor y))))))
+
+(define mult-bignum
+  (lambda (x y)
+    (if (is-zero? x)
+        (zero)
+        (suma-bignum (mult-bignum (predecessor x) y) y))
+    ))
 
