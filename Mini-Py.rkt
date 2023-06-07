@@ -9,7 +9,7 @@
 ;;Damian Espinosa 2028180
 ;;Luisa Cardenas 1823494
 
-;;*********************************Gramatitca**************************************
+;;*********************************Gramatica**************************************
 
 ;;<BSAT>            ::= {<class-decl>}* <expresion>
 ;;                      <bsat-program (class exp)>
@@ -193,3 +193,106 @@
     (to-o-downto ("downto") downto)
     (bool ("true") true-exp)
     (bool ("false") false-exp)
+    
+    
+    
+;;===================================================================================
+;;scan&parse
+
+(define scan&parse
+  (sllgen:make-string-parser lexico gramatica))
+
+;;===================================================================================
+;;ambiente
+
+(define-datatype ambiente ambiente?
+  (empty-env)
+  (extend-env (lvar (list-of symbol?))
+              (lvalor vector?)
+              (env ambiente?)
+              )
+  )
+
+(define recursively-extended-env-record
+  (lambda (proc-names lidss bodies old-env)
+    (let*
+        (
+         (len (length proc-names))
+         (vec (make-vector len))
+         (env (extend-env proc-names vec old-env))
+         )
+      (letrec
+          [
+           (actualizar-vector
+            (lambda (pos lidds lbodies)
+              (cond
+                [(null? lidds) env]
+                [else
+                 (begin
+                   (vector-set! vec pos (direct-target (closure (car lidds) (car lbodies) env)))
+                   (actualizar-vector (+ pos  1) (cdr lidds) (cdr lbodies))
+                   )
+                 ]
+                )
+              )
+            )
+           ]
+        (actualizar-vector 0 lidss bodies)
+       )
+        )
+      )
+  )
+
+;;===================================================================================
+;;referencia
+(define-datatype referencia referencia?
+  (a-ref (pos number?) (vec vector?))
+  )
+
+;;===================================================================================
+;;validar target de referencia
+
+(define ref-to-direct-target?
+  (lambda (val)
+    (if (referencia? val)
+        (cases referencia val
+          (a-ref (pos vec)
+                 (cases target (vector-ref vec pos)
+                   (direct-target (expval) #t)
+                   (cons-target (expval) #t)
+                   (indirect-target (ref) (eopl:error "no puede pasar una referencia enre procedimientos")
+                   )
+                 )
+                 )
+          )
+        #f
+        )
+    )
+  )
+
+;;===================================================================================
+;;Validar Target directo
+
+(define no-refid-exp?
+  (lambda (exp)
+    (cond
+      [(number? exp) #t]
+      [(expresion? exp)
+       (cases expresion exp
+         (refid-exp (id) #f)
+         (else #t)
+         )]
+      [else #t]
+      )
+    )
+  )
+
+;;===================================================================================
+;;Target
+(define-datatype target target?
+  (direct-target (expval no-refid-exp?))
+  (indirect-target (ref ref-to-direct-target?))
+  (cons-target (expval no-refid-exp?))
+  )
+
+
