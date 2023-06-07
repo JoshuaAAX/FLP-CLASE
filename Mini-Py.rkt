@@ -116,3 +116,80 @@
 ;;<oper-bin-bool>   ::= and|or
 ;;<oper-un-bool>    ::= not
 ;;<bool>            ::= true | false
+
+
+;;==================================================================================
+
+;;Definición Lexico
+
+(define lexico
+  '(
+    (espacioblanco (whitespace) skip)
+    (comentario ("#" (not #\newline)) skip)
+    (identificador ("@" letter (arbno (or letter digit))) symbol)
+    (letras (letter) string)
+    (letras (letter (arbno (or letter digit))) string)
+    (numero (digit (arbno digit)) number)
+    (numero (digit (arbno digit) "." digit (arbno digit)) number)
+    (numero ("-" digit (arbno digit)) number)
+    (numero ("-" digit (arbno digit) "." digit (arbno digit)) number)
+    )
+  )
+
+;;===================================================================================
+
+;;Definición Grámatica
+(define gramatica
+  '(
+    (BSAT ((arbno class-decl)expresion) bsat-program)
+    (class-decl
+     ("class" identificador "extends" identificador
+              (arbno "field" identificador) (arbno method-decl)) a-class-decl)
+    (method-decl ("def" identificador "(" (separated-list identificador ",") ")" expresion) a-method-decl)
+    (expresion (numero) num-exp)
+    (expresion ("x_16(" (arbno numero) ")") numerohex-exp)
+    (expresion ("'" letras "'") caracter-exp)
+    (expresion ("\"" letras "\"") cadena-exp)
+    (expresion (identificador) identificador-exp)
+    (expresion ("$" identificador) refid-exp)
+    (expresion ("var" (separated-list identificador "=" expresion ",") "in" expresion)  var-exp)
+    (expresion ("set" identificador "=" expresion) asignar-exp)
+    (expresion ("cons" (separated-list identificador "=" expresion ",") "in" expresion)  cons-exp)
+    (expresion ("rec" (arbno identificador "(" (separated-list identificador ",") ")" "=" expresion)  "in" expresion)
+                rec-exp)
+    (expresion ("begin" expresion (arbno ";" expresion) "end") begin-exp)
+    (expresion ("for" identificador "=" expresion to-o-downto expresion "do" expresion "done") for-exp)
+    (expresion (prim-bin "(" expresion "," expresion ")") primbin-exp)
+    (expresion (prim-un "(" expresion ")") primun-exp)
+    (expresion ("proc" "(" (separated-list identificador ",") ")" expresion) proc-exp)
+    (expresion ("(" expresion (arbno expresion) ")") app-exp)
+    (expresion ("print" "(" expresion ")") print-exp)
+    (expresion ("FNC" numero "(" clausula-or (arbno "and" clausula-or) ")") fnc-exp)
+    (expresion ("if" expr-bool "then" expresion "else" expresion "end") if-exp)
+    (expresion ("while" expr-bool "do" expresion "done") while-exp)
+    (expresion ("set-vec" "(" expresion "," expresion "," expresion ")") set-vec-exp)
+    (expresion ("set-reg" "(" expresion "," expresion "," expresion ")") set-reg-exp)
+    (expresion ("ref-reg" "(" identificador "," registro ")") ref-reg-exp)
+    (expresion ("create-reg" "(" identificador "=" expresion "," expresion")") crear-reg-exp)
+    (expresion (lista) lista-exp)
+    (expresion (vectorB) vector-exp)
+    (expresion (registro) registro-exp)
+    (expresion (expr-bool) bool-exp)
+    (expresion ("register?" "(" expresion ")") registros?-exp)
+    (expresion ("vector?" "(" expresion ")") isvector-exp)
+    (expresion ("new" identificador "(" (separated-list expresion ",") ")") new-object-exp)
+    (expresion ("send" expresion identificador "(" (separated-list expresion ",") ")") method-app-exp)
+    (expresion ("super" identificador "(" ( separated-list expresion ",") ")" ) super-call-exp)
+    (lista ("empty") empty-list)
+    (lista ("[" (separated-list expresion ",") "]") lista1)
+    (vectorB ("vector" "[" (separated-list expresion ",") "]") vector1)
+    (registro ("{"(separated-list identificador "=" expresion ";")"}") registro1)
+    (expr-bool (pred-prim "(" expresion "," expresion ")") comparacion)
+    (expr-bool (oper-bin-bool "(" expr-bool "," expr-bool ")") conjuncion)
+    (expr-bool (bool) vlr-bool)
+    (expr-bool (oper-un-bool "(" expr-bool ")") op-comp)
+    (clausula-or ("(" numero (arbno "or" numero) ")" ) clausula-or-exp)
+    (to-o-downto ("to") to)
+    (to-o-downto ("downto") downto)
+    (bool ("true") true-exp)
+    (bool ("false") false-exp)
