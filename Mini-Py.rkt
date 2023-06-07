@@ -195,7 +195,51 @@
     (bool ("false") false-exp)
     
     
-    
+    ;;===================================================================================
+
+;;Primitivas unarias
+    (prim-un ("solveFNC") solve-fnc)
+    (prim-un ("add1") add1)
+    (prim-un ("sub1") sub1)
+    (prim-un ("add1_16") add1_16)
+    (prim-un ("sub1_16") sub1_16)
+    (prim-un ("lenght") lenght-exp)
+    (prim-un ("list?") lista?-exp)
+    (prim-un ("head") cabeza-exp)
+    (prim-un ("tail") cola-exp)
+
+   ;;===================================================================================
+
+;;Primitivas binarias
+    (prim-bin ("%") moduloB)
+    (prim-bin ("+") suma)
+    (prim-bin ("-") resta)
+    (prim-bin ("*") mult)
+    (prim-bin ("/") division)
+    (prim-bin ("+_16") suma16)
+    (prim-bin ("-_16") resta16)
+    (prim-bin ("*_16") mult16)
+    (prim-bin ("concat") concat-exp)
+    (prim-bin ("append") append-exp)
+    (prim-bin ("create-list") crear-lista-exp)
+    (prim-bin ("create-vec") crear-v-exp)
+    (prim-bin ("ref-vec") ref-vec-exp)
+
+    (pred-prim ("<") menor-exp)
+    (pred-prim (">") mayor-exp)
+    (pred-prim ("<=") menor=exp)
+    (pred-prim (">=") mayor=exp)
+    (pred-prim ("==") igual=exp)
+    (pred-prim ("!=") diferente-exp)
+    (oper-bin-bool ("and") and-exp)
+    (oper-bin-bool ("or") or-exp)
+    (oper-un-bool ("not") not-exp)
+    )
+  )
+  
+;;===================================================================================
+(sllgen:make-define-datatypes lexico gramatica)
+;(sllgen:list-define-datatypes lexico gramatica)
 ;;===================================================================================
 ;;scan&parse
 
