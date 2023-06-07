@@ -516,3 +516,243 @@
                                   (direct-target 5)))))))
               (empty-env))
   )
+
+;;===================================================================================
+;eval-binprim
+
+(define eval-binprim
+  (lambda (op op1 op2)
+    (cases prim-bin op
+      (suma () (+ op1 op2))
+      (resta () (- op1 op2))
+      (moduloB () (modulo op1 op2))
+      (mult () (* op1 op2))
+      (division () (/ op1 op2))
+      (suma16 () (suma-bignum op1 op2))
+      (resta16 () (resta-bignum op1 op2))
+      (mult16 () (mult-bignum op1 op2))
+      (concat-exp () (string-append op1 op2))
+      (append-exp () (append op1 op2))
+      (crear-lista-exp () (append op2 (list op1)))
+      (crear-v-exp () (list->vector (append (vector->list op2) (list op1))))
+      (ref-vec-exp () (vector-ref op2 op1))
+      )
+    )
+  )
+
+;;===================================================================================
+;eval-clausulaor
+
+(define eval-clausulaor
+  (lambda (cla)
+    (cases clausula-or cla
+      (clausula-or-exp (n lnum)
+                       (append (list n) lnum)
+                       )
+      )
+    )
+  )
+ 
+;;===================================================================================
+;eval-fnc
+
+(define eval-fnc
+  (lambda (n claor lclaor)
+    (list n (append (list (eval-clausulaor claor)) (map eval-clausulaor lclaor)))
+    ))
+    
+;;===================================================================================
+
+;nextcom
+
+(define nextcom
+  (lambda (n)
+    (if (is-zero? n)
+	'(1)
+	(let ((t (+ (car n) 1)))
+	  (if (= t 2)
+	      (cons 0 (nextcom (cdr n)))
+	      (cons t (cdr n))
+              )
+          )
+        )
+    )
+  )
+;;===================================================================================
+;convert-num->bool
+
+(define convert-num->bool
+  (lambda (x)
+    (if (zero? x)
+        #f
+        #t
+        )
+    )
+  )
+
+;;===================================================================================
+;convert-list->vector
+
+(define convert-list->vector
+  (lambda (lst)
+    (cond
+      [(null? lst) empty]
+      [else
+       (cons (list->vector (map convert-num->bool (car lst))) (convert-list->vector (cdr lst)))]
+      )
+    )
+  )
+  
+ 
+;;===================================================================================
+
+;combinaciones
+
+(define combinaciones
+  (lambda (n)
+    (letrec
+        [
+         (limit (expt 2 n))
+         (lista (vector->list (make-vector n 0)))
+         (generar (lambda (limit lista)
+                    (cond
+                      ((eqv? 0 limit) empty)
+                      (else
+                       (cons lista (generar (- limit 1) (nextcom lista))))
+                      )
+                    )
+                  )
+         ]
+      (convert-list->vector (generar limit lista))
+        )
+    ))
+ 
+;;===================================================================================
+
+;valorbool
+
+(define valorbool
+  (lambda (vec n)
+    (if (< n 0)
+        (not (vector-ref vec (- (abs n) 1)))
+        (vector-ref vec (- n 1))
+        )
+    )
+  )
+
+;;===================================================================================
+;reemplazar
+
+(define reemplazar
+  (lambda (vec lst)
+    (cond
+      [(null? lst) empty]
+      [(number? lst) (valorbool vec lst)]
+      [(boolean? lst) lst]
+      [((list-of list?) lst)
+       (cons (reemplazar vec (car lst))
+             (reemplazar vec (cdr lst)))]
+      [(list? lst) (cons (reemplazar vec (car lst)) (reemplazar vec (cdr lst)))]
+      [else (list
+              (reemplazar vec (car lst))
+              (reemplazar vec (cdr lst)))]
+      )
+    )
+  )
+  
+;;===================================================================================
+;evaluar-or
+
+(define evaluar-or
+  (lambda (lst)
+    (cond
+      [(null? (cdr lst)) (car lst)]
+      [else (or (car lst) (evaluar-or (cdr lst)))]
+      )
+    )
+  )
+
+;;===================================================================================
+;evaluar-and
+
+(define evaluar-and
+  (lambda (lst)
+    (cond
+      [(null? (cdr lst)) (evaluar-or (car lst))]
+      [else (and (evaluar-or (car lst)) (evaluar-and (cdr lst)))]
+      )
+    )
+  )
+
+;;===================================================================================
+;eval-solve-fnc
+
+(define eval-solve-fnc
+  (lambda (lst)
+    (letrec
+        [
+         (comb (combinaciones (car lst)))
+         (evaluar (lambda (com lst)
+                          (cond
+                            [(null? com) (list 'insactisfactible com)]
+                            [else (if (evaluar-and (reemplazar (car com) lst))
+                                      (list 'satisfactible (vector->list (car com)))
+                                      (evaluar (cdr com) lst)
+                                      )]
+                            )
+                          ))
+         ]
+      (evaluar comb (cadr lst))
+        )
+    ))
+
+;;===================================================================================
+;eval-binprim
+
+(define eval-unprim
+  (lambda (op op1)
+    (cases prim-un op
+      (solve-fnc () (eval-solve-fnc op1))
+      (add1 () (+ op1 1))
+      (sub1 () (- op1 1))
+      (add1_16 () (suma-bignum op1 '(1)))
+      (sub1_16 () (resta-bignum op1 '(1)))
+      (lenght-exp () (length op1))
+      (lista?-exp () (list? op1))
+      (cabeza-exp () (car op1))
+      (cola-exp ()
+                (letrec
+                    [(recorrer
+                      (lambda (lst)
+                        (cond
+                          [(null? (cdr lst)) (car lst)]
+                          [else (recorrer (cdr lst))]
+                          )
+                        )
+                      )]
+                  (recorrer op1)
+                    )
+                )
+      )
+    )
+  )
+
+;;===================================================================================
+; clousure
+
+(define-datatype procval procval?
+  (closure
+   (ids (list-of symbol?))
+   (body expresion?)
+   (env ambiente?)
+   )
+  )
+
+(define apply-procedure
+  (lambda (proc args)
+    (cases procval proc
+      (closure (ids body env)
+               (eval-expresion body (extend-env ids (list->vector args) env)))
+      )
+    )
+  )
