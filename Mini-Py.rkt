@@ -339,7 +339,6 @@
   (cons-target (expval no-refid-exp?))
   )
 ;;===================================================================================
-
 ;;Bignum
 
 (define zero
@@ -401,4 +400,119 @@
         (zero)
         (suma-bignum (mult-bignum (predecessor x) y) y))
     ))
+    
+;;===================================================================================
+;;apply-env-ref
 
+(define apply-env-ref
+  (lambda (amb var)
+    (cases ambiente amb
+      (empty-env () (eopl:error "no se encontró la variable ~s" var))
+      (extend-env (lvar vec env)
+                  (letrec
+                      [
+                       (buscar-ambiente
+                        (lambda (pos lids)
+                          (cond
+                            [(null? lids) (apply-env-ref env var)]
+                            [(equal? var (car lids)) (a-ref pos vec)]
+                            [else (buscar-ambiente (+ pos 1) (cdr lids))]
+                            )
+                          )
+                        )
+                       ]
+                    (buscar-ambiente 0 lvar)
+                      )
+                  )
+      )
+    )
+  )
+
+;;===================================================================================
+;;def-ref
+
+(define def-ref
+  (lambda (ref)
+        (cases target (primitive-deref ref)
+          (direct-target (exp-val) exp-val)
+          (cons-target (exp-val) exp-val)
+          (indirect-target (ref1)
+                           (cases target (primitive-deref ref1)
+                             (direct-target (exp-val) exp-val)
+                             (cons-target (exp-val) exp-val)
+                             (indirect-target (ref2)
+                                              (eopl:error "solo se pueden de 1 referencia a otra")
+                                              )
+                             )
+                           )
+          )
+    )
+  )
+
+;;===================================================================================
+;;primitive-deref
+
+(define primitive-deref
+ (lambda (ref)
+   (cases referencia ref
+     (a-ref (pos vec)
+            (vector-ref vec pos)
+            )
+     )
+   )
+ )
+
+;;===================================================================================
+;;set-ref!
+
+(define set-ref!
+  (lambda (ref val)
+    (let
+        ((ref
+          (cases target (primitive-deref ref)
+            (direct-target (exp-val) ref)
+            (cons-target (exp-val) (eopl:error "No se puede cambiar el valor de una constante"))
+            (indirect-target (ref1) ref1)
+            )
+          )
+         )
+      (primitive-setref! ref (direct-target val))
+      )
+    )
+  )
+
+;;===================================================================================
+;;primitive-setref!
+
+(define primitive-setref!
+  (lambda (ref val)
+    (cases referencia ref
+      (a-ref (pos vec)
+             (vector-set! vec pos val)
+             )
+      )
+    )
+  )
+
+;;===================================================================================
+;;apply-env
+
+(define apply-env
+  (lambda (env var)
+    (def-ref (apply-env-ref env var))
+   )
+  )
+  
+
+;;===================================================================================
+;;Ambiente inicial
+(define init-env
+  (extend-env (list '@x '@y '@z '@a)
+              (list->vector (list (direct-target 4)
+                                  (direct-target 2)
+                                  (direct-target 5)
+                                  (indirect-target (a-ref 0 (list->vector (list (direct-target 4)
+                                  (direct-target 2)
+                                  (direct-target 5)))))))
+              (empty-env))
+  )
