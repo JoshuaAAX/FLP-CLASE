@@ -1501,3 +1501,196 @@
               (find-method-and-apply m-name
                                      (class-name->super-name host-name)
                                      self args))))))
+
+;;===================================================================================
+;;eval-rands
+
+(define eval-rands
+  (lambda (exps env)
+    (map
+     (lambda (exp) (eval-expresion exp env))
+     exps)
+    )
+  )
+
+;;===================================================================================
+;;eval-expresion
+
+(define eval-expresion
+  (lambda (pgm env)
+    (cases expresion pgm
+      (num-exp (n) n)
+      (numerohex-exp (lnum) lnum)
+      (caracter-exp (caracter) (string->symbol caracter))
+      (cadena-exp (cad) cad)
+      (identificador-exp (id) (apply-env env id))
+      (refid-exp (id) (indirect-target
+                     (let
+                         (
+                          (ref (apply-env-ref env id))
+                          )
+                       (cases target (primitive-deref ref)
+                         (direct-target (expval) ref)
+                         (cons-target (expval) ref)
+                         (indirect-target (ref1) ref1)
+                         )
+                         )
+                     ))
+      (var-exp (ids rands body)
+               (let
+                   ((rands-num (map (lambda (x) (eval-rand-pref x env)) rands)))
+                 (eval-expresion body (extend-env ids (list->vector rands-num) env))
+                   ))
+      (asignar-exp (id exp)
+                   (begin
+                     (set-ref!
+                      (apply-env-ref env id)
+                      (eval-expresion exp env))
+                     'OK!))
+      (cons-exp (ids rands body)
+                (let (
+                      (rands-num (map (lambda (x) (cons-target (eval-expresion x env))) rands))
+                      )
+                 (eval-expresion body (extend-env ids (list->vector rands-num) env))
+                   ))
+      (primbin-exp (op exp1 exp2)
+                   (eval-binprim op
+                                 (eval-expresion exp1 env)
+                                 (eval-expresion exp2 env)))
+      (proc-exp (ids body)
+                (closure ids body env)
+                )
+      (app-exp (rator rands)
+               (let
+                   [
+                    (proc (eval-expresion rator env))
+                    (lrands (map (lambda (x) (eval-rand-pref x env))rands))
+                    ]
+
+               (if (procval? proc)
+                   (apply-procedure proc lrands)
+                   (eopl:error "%s no es un procedimiento" proc)
+                   )
+                 )
+               )
+      (rec-exp (proc-names idss bodies body)
+               (eval-expresion body (recursively-extended-env-record proc-names idss bodies env)))
+      (print-exp (exp) (begin (display (eval-expresion exp env)) (display "\n") 'endPrint))
+
+      (fnc-exp (n claor lclaor)
+               (eval-fnc n claor lclaor)
+               )
+
+      (for-exp (id exp1 tod exp2 body)
+               (letrec
+                   [(i (eval-expresion exp1 env))
+                    (parada (eval-expresion exp2 env))
+                    (op (cases to-o-downto tod
+                          (to () +)
+                          (downto () -)
+                          ))
+                    (proc-for (closure (list id) body env))
+                    (for (lambda (var)
+                           (if (eqv? var parada)
+                               (apply-procedure proc-for (list (direct-target var)))
+                               (begin (apply-procedure proc-for (list (direct-target var))) (for (op var 1)))
+                               )
+                               )
+                           )]
+                 (for i)
+                   )
+               )
+      (begin-exp (exp lexps)
+                 (if (null? lexps)
+                     (eval-expresion exp env)
+                     (letrec
+                         [(recorrer (lambda (L)
+                                      (cond
+                                        [(null? (cdr L)) (eval-expresion (car L) env)]
+                                        [else (begin (eval-expresion (car L) env)
+                                                     (recorrer (cdr L))
+                                        )]
+                                        )
+                                      ))
+                          ]
+                       (begin
+                         (eval-expresion exp env)
+                         (recorrer lexps))
+                         )
+                     )
+                 )
+
+      (lista-exp (lexps) (eval-lista lexps env))
+      (vector-exp (vexps) (eval-vector vexps env))
+      (registro-exp (rexp) (eval-registro rexp env))
+      (ref-reg-exp (id reg) (eval-ref-reg id reg env))
+      (registros?-exp (exp) (eval-register? exp))
+      (isvector-exp (exp) (eval-vector? exp))
+      (primun-exp (op exp) (eval-unprim op (eval-expresion exp env)))
+
+      (if-exp (exp-bool true-exp false-exp)
+              (if (eval-bool-exp exp-bool env)
+                  (eval-expresion true-exp env)
+                  (eval-expresion false-exp env)
+                  )
+              )
+
+      (while-exp (exp-bool exp)
+                 (iteracion exp-bool exp env)
+                 )
+
+      (bool-exp (exp-bool)
+                (eval-bool-exp exp-bool env)
+                )
+
+      (set-vec-exp (exp1 exp2 exp3)
+                   (begin
+                     (vector-set! (eval-expresion exp2 env) (eval-expresion exp1 env) (eval-expresion exp3 env))
+                     'OK!
+                     )
+                   )
+
+      (crear-reg-exp (id exp1 rexp)
+                     (list->vector
+                      (append
+                       (vector->list (eval-expresion rexp env))
+                       (list (list->vector (list id (eval-expresion exp1 env))))
+                       )
+                      )
+                     )
+
+      (set-reg-exp (exp1 exp2 exp3)
+                   (let
+                       (
+                        (id
+                         (cases expresion exp1
+                           (identificador-exp (s) s)
+                           (else (eopl:error "no es un identificador"))
+                           )
+                         )
+                        )
+                     (eval-set-reg id (eval-expresion exp2 env) (eval-expresion exp3 env))
+                     )
+                   )
+      (new-object-exp (class-name rands)
+                      (let ((args (eval-rands rands env))
+                            (obj (new-object class-name)))
+                        (find-method-and-apply
+                         '@initialize class-name obj args)
+                        obj))
+      (method-app-exp (obj-exp method-name rands)
+                      (let ((args (eval-rands rands env))
+                            (obj (eval-expresion obj-exp env)))
+                        (find-method-and-apply
+                         method-name (object->class-name obj) obj args)))
+      (super-call-exp (method-name rands)
+                      (let ((args (eval-rands rands env))
+                            (obj (apply-env-ref env '@self)))
+                        (find-method-and-apply
+                         method-name (apply-env-ref env '%super) obj args)
+                        )
+                      )
+      (else (eopl:error "No es una expresión válida"))
+      )
+    )
+  )
