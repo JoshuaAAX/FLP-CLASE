@@ -1,7 +1,7 @@
 #lang eopl
 
 ;******************************************************************************************
-;;;;; Interpretador Taller 3
+;;;;; Interpretador Mini Py
 
 ;; repositorio: https://github.com/JoshuaAAX/FLP-CLASE/
 
@@ -754,5 +754,242 @@
       (closure (ids body env)
                (eval-expresion body (extend-env ids (list->vector args) env)))
       )
+    )
+  )
+  
+  
+;;===================================================================================
+;; eval-rand-pref
+(define eval-rand-pref
+  (lambda (x amb)
+    (cases expresion x
+      (refid-exp (id) (indirect-target
+                     (let
+                         (
+                          (ref (apply-env-ref amb id))
+                          )
+                       (cases target (primitive-deref ref)
+                         (direct-target (expval) ref)
+                         (cons-target (expval) ref)
+                         (indirect-target (ref1) ref1)
+                         )
+                         )
+                     ))
+      (else
+       (direct-target (eval-expresion x amb))
+       )
+      )
+    )
+  )
+  
+;;===================================================================================
+;;eval-lista
+
+(define eval-lista
+  (lambda (l-exp env)
+    (cases lista l-exp
+      (empty-list () empty)
+      (lista1 (lexps) (map (lambda (x) (eval-expresion x env)) lexps))
+      )
+    )
+  )
+  
+;;===================================================================================
+;;eval-vector
+
+(define eval-vector
+  (lambda (l-exp env)
+    (cases vectorB l-exp
+      (vector1 (lexps) (list->vector (map (lambda (x) (eval-expresion x env)) lexps)))
+      )
+    )
+  )
+
+;;===================================================================================
+;;eval-registro
+
+(define eval-registro
+  (lambda (l-exp env)
+    (cases registro l-exp
+      (registro1 (lids lexp)
+                 (if (null? lids)
+                     #()
+                     (letrec
+                     [(armarRegistro (lambda (lids lexp)
+                                       (cond
+                                         [(null? lids) empty]
+                                         [else (append (list
+                                                        (list->vector
+                                                               (list
+                                                                (car lids)
+                                                                (eval-expresion (car lexp) env))))
+                                                       (armarRegistro (cdr lids) (cdr lexp)))]
+                                         )
+                                       ))]
+                   (list->vector (armarRegistro lids lexp))
+                     )))
+      )
+    )
+  )
+
+;;===================================================================================
+;;eval-register?
+
+(define eval-register?
+  (lambda (exp)
+    (cases expresion exp
+      (registro-exp (reg)
+                    (cases registro reg
+                      (registro1 (lids lexp) #t)
+                      (else #f)
+                      )
+                    )
+      (else #f)
+      )
+    )
+  )
+
+;;===================================================================================
+;;eval-vector?
+
+(define eval-vector?
+  (lambda (exp)
+    (cases expresion exp
+      (vector-exp (vec)
+                    (cases vectorB vec
+                      (vector1 (lexp) #t)
+                      (else #f)
+                      )
+                    )
+      (else #f)
+      )
+    )
+  )
+
+;;===================================================================================
+;;eval-ref-reg
+
+(define eval-ref-reg
+  (lambda (id reg env)
+    (letrec
+        [(op1 id)
+         (op2 (eval-registro reg env))
+         (buscar-id (lambda (id ac)
+                      (cond
+                        [(eqv? (vector-length op2) 0) (eopl:error "El registro está vacío" id)]
+                        [(eqv? ac (vector-length op2)) (eopl:error "No se encontró la clave" id)]
+                        [(eqv? id (vector-ref (vector-ref op2 ac) 0))
+                         (vector-ref (vector-ref op2 ac) 1)]
+                        [else (buscar-id id (+ ac 1))]
+                        )
+                      ))]
+      (buscar-id op1 0)
+      )
+    )
+  )
+
+;;===================================================================================
+;;eval-set-reg
+
+(define eval-set-reg
+  (lambda (id reg val)
+    (letrec
+        [
+         (buscar-id (lambda (key ac)
+                      (cond
+                        [(eqv? (vector-length reg) 0) (eopl:error "El registro está vacío" key)]
+                        [(eqv? ac (vector-length reg)) (eopl:error "No se encontró la clave" key)]
+                        [(eqv? key (vector-ref (vector-ref reg ac) 0))
+                         (begin
+                           (vector-set! (vector-ref reg ac) 1 val)
+                           'OK!)]
+                        [else (buscar-id key (+ ac 1))]
+                        )
+                      ))]
+      (buscar-id id 0)
+      )
+    )
+  )
+
+;;===================================================================================
+;;eval-bool-exp
+
+(define eval-bool-exp
+  (lambda (exp-bool env)
+    (cases expr-bool exp-bool
+                  (comparacion (pre-prim exp1 exp2)
+                               (eval-pred-prim pre-prim
+                                               (eval-expresion exp1 env)
+                                               (eval-expresion exp2 env))
+                               )
+                  (conjuncion (op-bin-bool exp-bool1 exp-bool2)
+                              (eval-oper-bin-bool op-bin-bool
+                                                  (eval-bool-exp exp-bool1 env)
+                                                  (eval-bool-exp exp-bool2 env))
+                              )
+                  (vlr-bool (valor)
+                            (cases bool valor
+                              (true-exp () #t)
+                              (false-exp () #f)
+                              )
+                            )
+                  (op-comp (op-un-bool exp-bool1)
+                              (eval-oper-un-bool op-un-bool (eval-bool-exp exp-bool1 env))
+                              )
+                  )
+    )
+  )
+
+;;===================================================================================
+;;eval-pred-prim
+
+(define eval-pred-prim
+  (lambda (op op1 op2)
+    (cases pred-prim op
+      (menor-exp () (< op1 op2))
+      (mayor-exp () (> op1 op2))
+      (menor=exp () (<= op1 op2))
+      (mayor=exp () (>= op1 op2))
+      (igual=exp () (eqv? op1 op2))
+      (diferente-exp () (not (eqv? op1 op2)))
+      )
+    )
+  )
+
+;;===================================================================================
+;;eval-oper-bin-bool
+
+(define eval-oper-bin-bool
+  (lambda (op op1 op2)
+    (cases oper-bin-bool op
+      (and-exp () (and op1 op2))
+      (or-exp () (or op1 op2))
+      )
+    )
+  )
+
+;;===================================================================================
+;;eval-oper-un-bool
+
+(define eval-oper-un-bool
+  (lambda (op op1)
+    (cases oper-un-bool op
+      (not-exp () (not op1))
+      )
+    )
+  )
+  
+;;===================================================================================
+;;iteracion
+
+(define iteracion
+  (lambda (exp-bool exp env)
+    (if (eval-bool-exp exp-bool env)
+                        (begin
+                          (eval-expresion exp env)
+                          (iteracion exp-bool exp env)
+                          )
+                        'EndWhile
+                        )
     )
   )
