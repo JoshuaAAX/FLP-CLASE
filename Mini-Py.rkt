@@ -1254,3 +1254,250 @@
       )
     )
   )
+ 
+;;======================================objectos====================================
+
+
+;the-class-env
+
+(define the-class-env '())
+
+;;===================================================================================
+;elaborate-class-decls!
+
+(define elaborate-class-decls!
+  (lambda (c-decls)
+    (set! the-class-env c-decls)))
+;;===================================================================================
+;class-decl->class-name
+
+(define class-decl->class-name
+  (lambda (c-decl)
+    (cases class-decl c-decl
+      (a-class-decl (class-name super-name field-ids m-decls)
+                    class-name))))
+;;===================================================================================
+;class-decl->class-name
+
+(define class-decl->super-name
+  (lambda (c-decl)
+    (cases class-decl c-decl
+      (a-class-decl (class-name super-name field-ids m-decls)
+                    super-name))))
+;;===================================================================================
+;class-decl->field-ids
+
+(define class-decl->field-ids
+  (lambda (c-decl)
+    (cases class-decl c-decl
+      (a-class-decl (class-name super-name field-ids m-decls)
+                    field-ids))))
+;;===================================================================================
+;class-decl->method-decls
+
+(define class-decl->method-decls
+  (lambda (c-decl)
+    (cases class-decl c-decl
+      (a-class-decl (class-name super-name field-ids m-decls)
+                    m-decls))))
+;;===================================================================================
+;method-decl->method-name
+
+(define method-decl->method-name
+  (lambda (md)
+    (cases method-decl md
+      (a-method-decl (method-name ids body) method-name))))
+;;===================================================================================
+;method-decl->ids
+
+(define method-decl->ids
+  (lambda (md)
+    (cases method-decl md
+      (a-method-decl (method-name ids body) ids))))
+;;===================================================================================
+;method-decl->body
+
+(define method-decl->body
+  (lambda (md)
+    (cases method-decl md
+      (a-method-decl (method-name ids body) body))))
+;;===================================================================================
+;method-decls->method-names
+
+(define method-decls->method-names
+  (lambda (mds)
+    (map method-decl->method-name mds)))
+;;===================================================================================
+;cambio
+
+(define cambio
+  (lambda (algo)
+    (if (referencia? algo)
+        (def-ref algo)
+        algo
+        )
+    )
+  )
+;;===================================================================================
+;lookup-class
+
+(define lookup-class
+  (lambda (name)
+    (let loop
+      ((env the-class-env))
+      (cond
+        ((null? env)
+         (eopl:error 'lookup-class
+                     "Unknown class ~s" (cambio name)))
+        ((eqv? (class-decl->class-name (car env)) (cambio name)) (car env))
+        (else (loop (cdr env)))))))
+;;===================================================================================
+;define-datatype part
+
+(define-datatype part part?
+  (a-part
+   (class-name symbol?)
+   (fields vector?)))
+;;===================================================================================
+;part->class-name
+
+(define part->class-name
+  (lambda (prt)
+    (cases part prt
+      (a-part (class-name fields)
+        class-name))))
+;;===================================================================================
+;part->fields
+
+(define part->fields
+  (lambda (prt)
+    (cases part prt
+      (a-part (class-name fields)
+        fields))))
+;;===================================================================================
+;part->field-ids
+
+(define part->field-ids
+  (lambda (part)
+    (class-decl->field-ids (part->class-decl part))))
+;;===================================================================================
+;part->class-decl
+
+(define part->class-decl
+  (lambda (part)
+    (lookup-class (part->class-name part))))
+;;===================================================================================
+;part->method-decls
+
+(define part->method-decls
+  (lambda (part)
+    (class-decl->method-decls (part->class-decl part))))
+;;===================================================================================
+;part->super-name
+
+(define part->super-name
+  (lambda (part)
+    (class-decl->super-name (part->class-decl part))))
+;;===================================================================================
+;class-name->method-decls
+
+(define class-name->method-decls
+  (lambda (class-name)
+    (class-decl->method-decls (lookup-class class-name))))
+;;===================================================================================
+;class-name->super-name
+
+(define class-name->super-name
+  (lambda (class-name)
+    (class-decl->super-name (lookup-class class-name))))
+;;===================================================================================
+;object->class-name
+
+(define object->class-name
+  (lambda (parts)
+    (part->class-name (car parts))))
+;;===================================================================================
+;cambiar-a-target
+
+(define cambiar-a-target
+  (lambda (vec)
+    (list->vector (map (lambda (x) (direct-target x)) (vector->list vec)))
+    )
+  )
+;;===================================================================================
+;make-first-part
+
+(define make-first-part
+  (lambda (c-decl)
+    (a-part
+     (class-decl->class-name c-decl)
+     (cambiar-a-target (make-vector (length (class-decl->field-ids c-decl)))))))
+;;===================================================================================
+;new-object
+
+(define new-object
+  (lambda (class-name)
+    (if (eqv? class-name '@object)
+        '()
+        (let ((c-decl (lookup-class class-name)))
+          (cons
+           (make-first-part c-decl)
+           (new-object (class-decl->super-name c-decl)))))))
+;;===================================================================================
+;view-object-as
+
+(define view-object-as
+  (lambda (parts class-name)
+    (if (eqv? (part->class-name (car parts)) class-name)
+        parts
+        (view-object-as (cdr parts) class-name))))
+;;===================================================================================
+;build-field-env
+
+(define build-field-env
+  (lambda (parts)
+    (if (null? parts)
+        (empty-env)
+        (extend-env
+         (part->field-ids (car parts))
+         (part->fields    (car parts))
+         (build-field-env (cdr parts))))))
+;;===================================================================================
+;lookup-method-decl
+
+(define lookup-method-decl
+  (lambda (m-name m-decls)
+    (cond
+      ((null? m-decls) #f)
+      ((eqv? m-name (method-decl->method-name (car m-decls)))
+       (car m-decls))
+      (else (lookup-method-decl m-name (cdr m-decls))))))
+;;===================================================================================
+;apply-method
+
+(define apply-method
+  (lambda (m-decl host-name self args)
+    (let ((ids (method-decl->ids m-decl))
+          (body (method-decl->body m-decl))
+          (super-name (class-name->super-name host-name)))
+      (eval-expresion body
+                       (extend-env
+                        (cons '%super (cons '@self ids))
+                        (list->vector (cons (direct-target super-name) (cons (direct-target self) args)))
+                        (build-field-env
+                         (view-object-as (cambio self) (cambio host-name))))))))
+;;===================================================================================
+;find-method-and-apply
+
+(define find-method-and-apply
+  (lambda (m-name host-name self args)
+    (if (eqv? host-name '@object)
+        (eopl:error 'find-method-and-apply
+                    "No method for name ~s" m-name)
+        (let ((m-decl (lookup-method-decl m-name
+                                          (class-name->method-decls host-name))))
+          (if (method-decl? m-decl)
+              (apply-method m-decl host-name self args)
+              (find-method-and-apply m-name
+                                     (class-name->super-name host-name)
+                                     self args))))))
