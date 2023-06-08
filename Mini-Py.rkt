@@ -993,3 +993,53 @@
                         )
     )
   )
+;;===================================================================================
+;;objectos
+;;===================================================================================
+;;the-class-env
+
+(define the-class-env '())
+
+;;===================================================================================
+;;elaborate-class-decls!
+
+(define elaborate-class-decls!
+  (lambda (c-decls)
+    (set! the-class-env c-decls)))
+
+
+;;===================================================================================
+;;class-decl->class-name
+
+(define class-decl->class-name
+  (lambda (c-decl)
+    (cases class-decl c-decl
+      (a-class-decl (class-name super-name field-ids m-decls)
+                    class-name))))
+
+;;===================================================================================
+;;class-decl->class-name
+
+(define class-decl->super-name
+  (lambda (c-decl)
+    (cases class-decl c-decl
+      (a-class-decl (class-name super-name field-ids m-decls)
+                    super-name))))
+
+
+;;class-decl->field-ids
+
+(define class-decl->field-ids
+  (lambda (c-decl)
+    (cases class-decl c-decl
+      (a-class-decl (class-name super-name field-ids m-decls)
+                    field-ids))))
+
+;;===================================================================================
+;;class-decl->method-decls
+
+(define class-decl->method-decls
+  (lambda (c-decl)
+    (cases class-decl c-decl
+      (a-class-decl (class-name super-name field-ids m-decls)
+                    m-decls))))
