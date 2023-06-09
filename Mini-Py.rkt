@@ -1254,6 +1254,20 @@
       )
     )
   )
+;;===================================================================================
+;iteracion
+
+(define iteracion
+  (lambda (exp-bool exp env)
+    (if (eval-bool-exp exp-bool env)
+                        (begin
+                          (eval-expresion exp env)
+                          (iteracion exp-bool exp env)
+                          )
+                        'EndWhile
+                        )
+    )
+  )
  
 ;;======================================objectos====================================
 
