@@ -1708,3 +1708,112 @@
       )
     )
   )
+
+;;===================================================================================
+
+;eval-program
+
+
+(define eval-program
+  (lambda (pgm)
+    (cases BSAT pgm
+      (bsat-program (lclass exp)
+                    (elaborate-class-decls! lclass)
+                    (eval-expresion exp init-env))
+      (else (eopl:error "No es un programa BSAT valido"))
+        )
+    )
+  )
+;;===================================================================================
+
+
+(define interpretador
+  (sllgen:make-rep-loop
+   ">>"
+   (lambda (pgm) (eval-program pgm))
+   (sllgen:make-stream-parser lexico gramatica)
+   )
+  )
+
+(interpretador)
+
+;;===================================================================================
+;;===================================================================================
+
+; pruebas de producciones
+
+
+;(scan&parse "5");  numero-exp
+;(scan&parse "x_16(4 5 3)");  numerohex-exp
+;(scan&parse "'f'");  caracter-exp
+;(scan&parse "\" hola \"");  cadena-exp
+;(scan&parse "false");  bool-exp con false-exp
+;(scan&parse "true");  bool-exp con true-exp
+;(scan&parse "@x");   identificador-exp
+;(scan&parse "var @x = 6 in add1(@x)");  var-exp
+;(scan&parse "$@x"); refid-exp
+(scan&parse "set @x = 6");  asignar-exp
+(scan&parse "cons @j = 99 in print(@j)");  cons-exp
+;(scan&parse "rec @f(@x)= add1(@x) in (@f 7)"); rec-exp
+;(scan&parse "begin print("hola") ; print("mundo\") end");  begin-exp
+;(scan&parse "begin print(\"hola\") ; print(\"mundo\") end");  begin-exp
+;(scan&parse "for @x = 1 to 5 do print(@x) done");  for-exp con to
+;(scan&parse "for @x = 5 downto 1 do print(@x) done");  for-exp con downto
+
+;;===================================================================================
+;(scan&parse "solveFNC(FNC 3 ((1 or 2 or 3) and (3 or 2 or 1)))");  solve-fnc
+;(scan&parse "+(2,3)"); prim-exp con +
+;(scan&parse "-(2,3)"); prim-exp con -
+;(scan&parse "*(2,3)"); prim-exp con *
+;(scan&parse "/(2,3)"); prim-exp con /
+;(scan&parse "%(2,3)"); prim-exp con %
+;(scan&parse "add1(2)");  prim-exp con add1
+;(scan&parse "sub1(2)");  prim-exp con sub1
+;(scan&parse "+_16(x_16(4 5 3), x_16(1 1))");  prim-exp con +_16
+;(scan&parse "-_16(x_16(4 5 3), x_16(1 2))");  prim-exp con -_16
+;(scan&parse "*_16(x_16(4 5 3), x_16(1))");  prim-exp con *_16
+;(scan&parse "add1_16(x_16(4 5 3))");  prim-exp con add1_16
+;(scan&parse "sub1_16(x_16(4 5 3))");  prim-exp con sub1_16
+;(scan&parse "lenght(\"cadena\")");  prim-exp con lenght
+;(scan&parse "concat(\"cadena\",\"cadena\")");  prim-exp con concat
+;(scan&parse "empty");  prim-exp con empty
+;(scan&parse "create-list(5,[])");  prim-exp con crear-lista
+;(scan&parse "list?([@x,@y])");  prim-exp con lista?
+;(scan&parse "head([@x,@y])");  prim-exp con cabeza
+;(scan&parse "tail([@x,@y])");  prim-exp con cola
+;(scan&parse "append([@x,@y],[@v,@w])");  prim-exp con append
+;(scan&parse "vector?(vector[@x,@y])");  prim-exp con vector?
+;(scan&parse "create-vec(5 , vector[])");  prim-exp con crear-vec
+;(scan&parse "ref-vec(2,vector[@x,@y])");  prim-exp con ref-vec
+;(scan&parse "register? ({@x=8})");  prim-exp con register?
+;(scan&parse "create-reg(@x=8,{@d=3})");  prim-exp con crear-reg
+;(scan&parse "ref-reg(@x,{@x=8})");  prim-exp con ref-reg
+;;===================================================================================
+
+;(scan&parse "set-vec(1,vector[@x,@y],5)");  prim-exp con set-vec
+;(scan&parse "set-reg(@x,{@x=8},9)");  prim-exp con set-reg
+;(scan&parse "proc(@x) set @x->4");  proc-exp
+;(scan&parse "(@x 5)");  app-exp paso por valor
+;(scan&parse "(@x $@z)");  app-exp paso por referencia
+;(scan&parse "print(\"Hola\")"); print-exp
+;(scan&parse "FNC 2 ((1 or 2) and (2 or 1))");  fnc-exp
+
+;;===================================================================================
+;(scan&parse "if <(2,3) then 2 else 3 end");  if-exp con pred-prim
+;(scan&parse "if >(2,3) then 2 else 3 end");  if-exp con pred-prim
+;(scan&parse "if <=(2,3) then 2 else 3 end");  if-exp con pred-prim
+;(scan&parse "if >=(2,3) then 2 else 3 end");  if-exp con pred-prim
+;(scan&parse "if ==(2,3) then 2 else 3 end");  if-exp con pred-prim
+;(scan&parse "if <>(2,3) then 2 else 3 end");  if-exp con pred-prim
+;(scan&parse "if and(true,false) then 2 else 3 end");  if-exp con oper-bin-bool
+;(scan&parse "if or(true,false) then 2 else 3 end");  if-exp con oper-bin-bool
+;(scan&parse "if true then 2 else 3 end");  if-exp con true-exp
+;(scan&parse "if false then 2 else 3 end");  if-exp con false-exp
+;(scan&parse "if not(true) then 2 else 3 end");  if-exp con oper-un-bool
+
+;;===================================================================================
+;(scan&parse "while not(true) do 2 done");  while-exp con oper-un-bool
+;(scan&parse "[4,5]");  lista-exp
+;(scan&parse "vector[4,5]");  vector-exp
+;(scan&parse "{@x=2;@y=5}");  registro-exp
+;(scan&parse "<(2,1)");  bool-exp
