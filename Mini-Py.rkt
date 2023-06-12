@@ -86,7 +86,7 @@
 ;;                      <super-call-exp(method-name rands)>
 ;;<clausula-or>     ::= (<numero>)+("or")
 ;;                      <clausula-or-exp (n lsn)>
-;;<prim-un>         ::= solveFNC | lenght
+;;<prim-un>         ::= solveFNC | length
 ;;                  ::= add1 | sub1 | add1_16 | sub1_16
 ;;                  ::= list? | head | tail
 ;;<prim-bin>        ::= + | - | * | % | / | +_16 | -_16 | *_16
@@ -203,7 +203,7 @@
     (prim-un ("sub1") sub1)
     (prim-un ("add1_16") add1_16)
     (prim-un ("sub1_16") sub1_16)
-    (prim-un ("lenght") lenght-exp)
+    (prim-un ("length") length-exp)
     (prim-un ("list?") lista?-exp)
     (prim-un ("head") cabeza-exp)
     (prim-un ("tail") cola-exp)
@@ -717,7 +717,7 @@
       (sub1 () (- op1 1))
       (add1_16 () (suma-bignum op1 '(1)))
       (sub1_16 () (resta-bignum op1 '(1)))
-      (lenght-exp () (length op1))
+      (length-exp () (length op1))
       (lista?-exp () (list? op1))
       (cabeza-exp () (car op1))
       (cola-exp ()
@@ -1505,7 +1505,7 @@
 ;(scan&parse "*_16(x_16(4 5 3), x_16(1))");  prim-exp con *_16
 ;(scan&parse "add1_16(x_16(4 5 3))");  prim-exp con add1_16
 ;(scan&parse "sub1_16(x_16(4 5 3))");  prim-exp con sub1_16
-;(scan&parse "lenght(\"cadena\")");  prim-exp con lenght
+;(scan&parse "length(\"cadena\")");  prim-exp con length
 ;(scan&parse "concat(\"cadena\",\"cadena\")");  prim-exp con concat
 ;(scan&parse "empty");  prim-exp con empty
 ;(scan&parse "create-list(5,[])");  prim-exp con crear-lista
